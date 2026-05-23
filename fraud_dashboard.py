@@ -22,11 +22,26 @@ transactions_fe = load_data()
 iso = joblib.load(os.path.join(BASE_DIR, "isolation_forest_model.pkl"))
 
 # ---------------------------------------------------------
-# ULTRA GLASS SHADCN CSS (EXACT PORT)
+# ULTRA GLASS SHADCN CSS + LAYOUT OVERRIDES
 # ---------------------------------------------------------
 st.markdown("""
 <style>
 
+/* Kill default Streamlit padding & gutters */
+.main .block-container {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    max-width: 1400px;
+}
+
+/* Hide default header padding */
+header[data-testid="stHeader"] {
+    background: transparent;
+}
+
+/* Background */
 body {
     background: radial-gradient(circle at top left,
         #050510 0%,
@@ -50,7 +65,7 @@ body {
         0 0 0 1px rgba(255, 255, 255, 0.08),
         0 4px 30px rgba(0, 0, 0, 0.45),
         0 0 25px rgba(255, 0, 255, 0.25);
-    padding: 20px 24px;
+    padding: 18px 20px;
     transition: all 0.25s ease;
 }
 
@@ -64,27 +79,40 @@ body {
 
 /* HEADERS */
 .section-header {
-    font-size: 26px;
+    font-size: 24px;
     font-weight: 600;
     color: #F5E8FF;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
 }
 
 /* METRICS */
 .metric-title {
-    font-size: 14px;
+    font-size: 13px;
     color: #CBB4FF;
+    margin-bottom: 4px;
 }
 
 .metric-value {
-    font-size: 30px;
+    font-size: 28px;
     font-weight: 700;
     color: #FF4FFB;
 }
 
-/* TABLES */
+/* DataFrame text */
 [data-testid="stDataFrame"] {
     color: #EDE6FF !important;
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background: rgba(5, 5, 20, 0.85);
+    backdrop-filter: blur(30px);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Remove default chart background padding */
+.css-1kyxreq, .css-1v0mbdj {
+    background: transparent !important;
 }
 
 </style>
@@ -94,7 +122,7 @@ body {
 # SIDEBAR
 # ---------------------------------------------------------
 st.sidebar.markdown(
-    "<h2 style='color:#E0D8FF;'>📊 Dashboard</h2>",
+    "<h2 style='color:#E0D8FF; margin-bottom: 1rem;'>📊 Dashboard</h2>",
     unsafe_allow_html=True
 )
 
@@ -108,9 +136,39 @@ page = st.sidebar.radio(
 # HEADER
 # ---------------------------------------------------------
 st.markdown(
-    "<h1 style='text-align:center; color:#F5E8FF; margin-bottom: 30px;'>🔍 Fraud Detection Dashboard</h1>",
+    "<h1 style='text-align:center; color:#F5E8FF; margin-bottom: 24px;'>🔍 Fraud Detection Dashboard</h1>",
     unsafe_allow_html=True
 )
+
+# ---------------------------------------------------------
+# CUSTOM PLOTLY THEME (GLASS STYLE)
+# ---------------------------------------------------------
+def glass_histogram(df):
+    fig = px.histogram(
+        df,
+        x="anomaly_score",
+        nbins=50,
+        color_discrete_sequence=["#FF4FFB"]
+    )
+    fig.update_layout(
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font_color="#EDE6FF",
+        xaxis=dict(
+            showgrid=False,
+            zeroline=False,
+            linecolor="rgba(255,255,255,0.25)",
+            tickfont=dict(color="#CBB4FF")
+        ),
+        yaxis=dict(
+            showgrid=False,
+            zeroline=False,
+            linecolor="rgba(255,255,255,0.25)",
+            tickfont=dict(color="#CBB4FF")
+        ),
+        margin=dict(l=10, r=10, t=10, b=10)
+    )
+    return fig
 
 # ---------------------------------------------------------
 # SYSTEM OVERVIEW
@@ -119,8 +177,8 @@ if page == "System Overview":
 
     st.markdown("<div class='section-header'>📊 Fraud Metrics</div>", unsafe_allow_html=True)
 
-    # --- Tier 1: Metrics ---
-    col1, col2, col3 = st.columns([1, 1, 1])
+    # Tier 1: Metrics row
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1.2])
 
     with col1:
         st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
@@ -140,25 +198,19 @@ if page == "System Overview":
         st.markdown(f"<div class='metric-value'>{transactions_fe['predicted_anomaly'].sum():,}</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- Tier 2: Chart + Activity Cards ---
+    with col4:
+        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='metric-title'>Avg Anomaly Score</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='metric-value'>{round(transactions_fe['anomaly_score'].mean(), 4)}</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # Tier 2: Chart + side metrics
     left, right = st.columns([2.2, 1])
 
     with left:
         st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
         st.markdown("<div class='section-header'>📈 Anomaly Score Distribution</div>", unsafe_allow_html=True)
-
-        fig = px.histogram(
-            transactions_fe,
-            x="anomaly_score",
-            nbins=50,
-            color_discrete_sequence=["#FF4FFB"]
-        )
-        fig.update_layout(
-            plot_bgcolor="rgba(0,0,0,0)",
-            paper_bgcolor="rgba(0,0,0,0)",
-            font_color="#EDE6FF"
-        )
-
+        fig = glass_histogram(transactions_fe)
         st.plotly_chart(fig, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -166,17 +218,15 @@ if page == "System Overview":
         metrics = {
             "High-Risk Customers": transactions_fe.groupby("customer_id")["anomaly_score"].mean().gt(0.7).sum(),
             "Flagged Transactions": transactions_fe["predicted_anomaly"].sum(),
-            "Avg Anomaly Score": round(transactions_fe["anomaly_score"].mean(), 4),
             "Model Version": "v1.0.0"
         }
-
         for title, value in metrics.items():
             st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
             st.markdown(f"<div class='metric-title'>{title}</div>", unsafe_allow_html=True)
             st.markdown(f"<div class='metric-value'>{value}</div>", unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- Tier 3: High-Risk Customers ---
+    # Tier 3: High-risk customers table
     st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
 
     risk_df = (
@@ -210,7 +260,7 @@ elif page == "Customer Search":
                 st.warning("Customer not found.")
             else:
                 st.success(f"Found {len(cust_df)} transactions for customer {customer_id}.")
-                st.dataframe(cust_df.head(20))
+                st.dataframe(cust_df.head(20), use_container_width=True)
             st.markdown("</div>", unsafe_allow_html=True)
 
         except:
@@ -251,7 +301,7 @@ elif page == "Customer Details":
 
         st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
         st.write("### Recent Transactions")
-        st.dataframe(cust_df.tail(20))
+        st.dataframe(cust_df.tail(20), use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
     else:

@@ -5,12 +5,12 @@ import os
 import plotly.express as px
 
 # ---------------------------------------------------------
-# MUST BE FIRST STREAMLIT COMMAND
+# PAGE CONFIG
 # ---------------------------------------------------------
 st.set_page_config(page_title="Fraud Detection Dashboard", layout="wide")
 
 # ---------------------------------------------------------
-# Load Data & Model
+# LOAD DATA
 # ---------------------------------------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -22,12 +22,79 @@ transactions_fe = load_data()
 iso = joblib.load(os.path.join(BASE_DIR, "isolation_forest_model.pkl"))
 
 # ---------------------------------------------------------
-# Sidebar Navigation
+# ULTRA GLASS SHADCN CSS (EXACT PORT)
+# ---------------------------------------------------------
+st.markdown("""
+<style>
+
+body {
+    background: radial-gradient(circle at top left,
+        #050510 0%,
+        #09071a 35%,
+        #120a2a 65%,
+        #1e0f3f 100%);
+    background-attachment: fixed;
+    color: #EDE6FF;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.01em;
+}
+
+/* ULTRA GLASS — EXACT SHADCN STYLE */
+.glass-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.08),
+        0 4px 30px rgba(0, 0, 0, 0.45),
+        0 0 25px rgba(255, 0, 255, 0.25);
+    padding: 20px 24px;
+    transition: all 0.25s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.2),
+        0 6px 40px rgba(0, 0, 0, 0.55),
+        0 0 35px rgba(255, 0, 255, 0.35);
+}
+
+/* HEADERS */
+.section-header {
+    font-size: 26px;
+    font-weight: 600;
+    color: #F5E8FF;
+    margin-bottom: 14px;
+}
+
+/* METRICS */
+.metric-title {
+    font-size: 14px;
+    color: #CBB4FF;
+}
+
+.metric-value {
+    font-size: 30px;
+    font-weight: 700;
+    color: #FF4FFB;
+}
+
+/* TABLES */
+[data-testid="stDataFrame"] {
+    color: #EDE6FF !important;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------
+# SIDEBAR
 # ---------------------------------------------------------
 st.sidebar.markdown(
-    """
-    <h2 style='color:#E0E0FF;'>📊 Dashboard</h2>
-    """,
+    "<h2 style='color:#E0D8FF;'>📊 Dashboard</h2>",
     unsafe_allow_html=True
 )
 
@@ -38,68 +105,15 @@ page = st.sidebar.radio(
 )
 
 # ---------------------------------------------------------
-# THEME: Navy‑Purple Glassmorphism + Magenta Accent
-# ---------------------------------------------------------
-st.markdown("""
-<style>
-
-body {
-    background: linear-gradient(135deg, #0a0f2d, #1b0f3b, #2a0f4f);
-    background-attachment: fixed;
-}
-
-/* Frosted Glass Panels */
-.glass-card {
-    background: rgba(10, 10, 25, 0.18);
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
-    border-radius: 18px;
-    padding: 20px 24px;
-    border: 1px solid rgba(255, 0, 255, 0.15);
-    box-shadow: 0 8px 32px rgba(255, 0, 255, 0.12);
-    margin-bottom: 22px;
-    color: #E8E0FF;
-}
-
-/* Section Headers */
-.section-header {
-    font-size: 28px;
-    font-weight: 600;
-    color: #F0D0FF;
-    margin-bottom: 14px;
-}
-
-/* Metric Titles */
-.metric-title {
-    font-size: 16px;
-    color: #D8C0FF;
-}
-
-/* Metric Values */
-.metric-value {
-    font-size: 32px;
-    font-weight: 700;
-    color: #FF4FFB;
-}
-
-/* Table Styling */
-[data-testid="stDataFrame"] {
-    color: #E8E0FF !important;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-# ---------------------------------------------------------
-# HERO HEADER
+# HEADER
 # ---------------------------------------------------------
 st.markdown(
-    "<h1 style='text-align:center; color:#F0D0FF; margin-bottom: 30px;'>🔍 Fraud Detection Dashboard</h1>",
+    "<h1 style='text-align:center; color:#F5E8FF; margin-bottom: 30px;'>🔍 Fraud Detection Dashboard</h1>",
     unsafe_allow_html=True
 )
 
 # ---------------------------------------------------------
-# SYSTEM OVERVIEW (Balanced Compact Layout)
+# SYSTEM OVERVIEW
 # ---------------------------------------------------------
 if page == "System Overview":
 
@@ -126,7 +140,7 @@ if page == "System Overview":
         st.markdown(f"<div class='metric-value'>{transactions_fe['predicted_anomaly'].sum():,}</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- Tier 2: Main Chart + Activity Cards ---
+    # --- Tier 2: Chart + Activity Cards ---
     left, right = st.columns([2.2, 1])
 
     with left:
@@ -142,14 +156,13 @@ if page == "System Overview":
         fig.update_layout(
             plot_bgcolor="rgba(0,0,0,0)",
             paper_bgcolor="rgba(0,0,0,0)",
-            font_color="#E8E0FF"
+            font_color="#EDE6FF"
         )
 
         st.plotly_chart(fig, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
     with right:
-        # Activity Cards
         metrics = {
             "High-Risk Customers": transactions_fe.groupby("customer_id")["anomaly_score"].mean().gt(0.7).sum(),
             "Flagged Transactions": transactions_fe["predicted_anomaly"].sum(),
@@ -163,7 +176,7 @@ if page == "System Overview":
             st.markdown(f"<div class='metric-value'>{value}</div>", unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- Tier 3: High-Risk Customer List ---
+    # --- Tier 3: High-Risk Customers ---
     st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
 
     risk_df = (

@@ -195,21 +195,29 @@ if page == "System Overview":
     st.markdown("<div class='section-header'>📊 Fraud Metrics</div>", unsafe_allow_html=True)
 
     # 4 equal-width metric cards
-    col1, col2, col3, col4 = st.columns(4)
+    with st.container():
+        st.markdown("<div class='equal-row'>", unsafe_allow_html=True)
+        col1, col2, col3, col4 = st.columns(4)
 
-    metrics = [
-        ("Total Transactions", f"{len(transactions_fe):,}"),
-        ("Unique Customers", f"{transactions_fe['customer_id'].nunique():,}"),
-        ("Detected Anomalies", f"{transactions_fe['predicted_anomaly'].sum():,}"),
-        ("Avg Anomaly Score", f"{round(transactions_fe['anomaly_score'].mean(), 4)}")
-    ]
+        metrics = [
+            ("Total Transactions", f"{len(transactions_fe):,}"),
+            ("Unique Customers", f"{transactions_fe['customer_id'].nunique():,}"),
+            ("Detected Anomalies", f"{transactions_fe['predicted_anomaly'].sum():,}"),
+            ("Avg Anomaly Score", f"{round(transactions_fe['anomaly_score'].mean(), 4)}")
+        ]
 
-    for col, (title, value) in zip([col1, col2, col3, col4], metrics):
-        with col:
-            st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-            st.markdown(f"<div class='metric-title'>{title}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='metric-value'>{value}</div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+        for col, (title, value) in zip([col1, col2, col3, col4], metrics):
+            with col:
+                card_html = f"""
+                <div class='glass-card'>
+                    <div class='metric-title'>{title}</div>
+                    <div class='metric-value'>{value}</div>
+                </div>
+                """
+                st.markdown(card_html, unsafe_allow_html=True)
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
 
     # Chart + side metrics
     left, right = st.columns([2.2, 1])

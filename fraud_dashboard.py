@@ -39,10 +39,7 @@ st.markdown("""
     max-width: 1320px;
     margin-left: auto;
     margin-right: auto;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    padding-top: 1.5rem !important;
-    padding-bottom: 2rem !important;
+    padding: 0 !important;
 }
 
 /* Remove Streamlit header padding */
@@ -53,11 +50,14 @@ header[data-testid="stHeader"] {
     margin: 0;
 }
 
-/* Remove extra spacing */
-[data-testid="stAppViewContainer"] {
+/* Remove Streamlit internal padding */
+[data-testid="stAppViewContainer"],
+[data-testid="stVerticalBlock"],
+[data-testid="column"] {
+    background: transparent !important;
     padding: 0 !important;
+    margin: 0 !important;
 }
-
 
 /* Background */
 body {
@@ -72,28 +72,31 @@ body {
     letter-spacing: -0.01em;
 }
 
-/* ULTRA GLASS — EXACT SHADCN STYLE */
+/* ULTRA GLASS — SHADCN STYLE */
 .glass-card {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.10);
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
     border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.08),
-        0 4px 30px rgba(0, 0, 0, 0.45),
-        0 0 25px rgba(255, 0, 255, 0.25);
-    padding: 18px 20px;
-    transition: all 0.25s ease;
+        0 0 25px rgba(255, 0, 255, 0.35),
+        0 4px 30px rgba(0, 0, 0, 0.45);
+    padding: 20px;
     height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
-.glass-card:hover {
-    transform: translateY(-3px);
-    box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.2),
-        0 6px 40px rgba(0, 0, 0, 0.55),
-        0 0 35px rgba(255, 0, 255, 0.35);
+/* Equal-height flexbox row */
+.equal-row {
+    display: flex;
+    gap: 16px;
+}
+
+.equal-row > div {
+    flex: 1;
+    display: flex;
 }
 
 /* HEADERS */
@@ -108,11 +111,11 @@ body {
 .metric-title {
     font-size: 13px;
     color: #CBB4FF;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
 .metric-value {
-    font-size: 28px;
+    font-size: 30px;
     font-weight: 700;
     color: #FF4FFB;
 }

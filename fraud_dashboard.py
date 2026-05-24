@@ -58,10 +58,6 @@ header[data-testid="stHeader"] {
     padding: 0 !important;
 }
 
-.block-container {
-    padding-top: 1.5rem !important;
-    padding-bottom: 2rem !important;
-}
 
 /* Background */
 body {

@@ -12,10 +12,13 @@ st.set_page_config(page_title="Fraud Detection Dashboard", layout="wide")
 # ---------------------------------------------------------
 # LOAD DATA
 # ---------------------------------------------------------
+import os
+
 if "__file__" in globals():
     BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 else:
     BASE_DIR = os.getcwd()
+
 
 
 @st.cache_data
@@ -51,10 +54,13 @@ header[data-testid="stHeader"] {
 }
 
 /* Remove extra spacing */
-.css-1y4p8pa, .css-1v0mbdj, .css-1kyxreq {
+[data-testid="stAppViewContainer"] {
     padding: 0 !important;
-    margin: 0 !important;
-    background: transparent !important;
+}
+
+.block-container {
+    padding-top: 1.5rem !important;
+    padding-bottom: 2rem !important;
 }
 
 /* Background */

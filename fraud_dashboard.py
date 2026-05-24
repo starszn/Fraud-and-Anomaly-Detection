@@ -12,14 +12,10 @@ st.set_page_config(page_title="Fraud Detection Dashboard", layout="wide")
 # ---------------------------------------------------------
 # LOAD DATA
 # ---------------------------------------------------------
-import os
-
 if "__file__" in globals():
     BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 else:
     BASE_DIR = os.getcwd()
-
-
 
 @st.cache_data
 def load_data():
@@ -218,7 +214,6 @@ if page == "System Overview":
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-
     # Chart + side metrics
     left, right = st.columns([2.2, 1])
 
@@ -235,13 +230,17 @@ if page == "System Overview":
             "Flagged Transactions": transactions_fe["predicted_anomaly"].sum(),
             "Model Version": "v1.0.0"
         }
-        for title, value in side_metrics.items():
-            st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-            st.markdown(f"<div class='metric-title'>{title}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='metric-value'>{value}</div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
 
-    # High-risk customers
+        for title, value in side_metrics.items():
+            card_html = f"""
+            <div class='glass-card'>
+                <div class='metric-title'>{title}</div>
+                <div class='metric-value'>{value}</div>
+            </div>
+            """
+            st.markdown(card_html, unsafe_allow_html=True)
+
+    # High-risk customers table
     st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
 
     risk_df = (
@@ -304,10 +303,13 @@ elif page == "Customer Details":
 
         for col, (title, value) in zip([col1, col2, col3], details):
             with col:
-                st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-                st.markdown(f"<div class='metric-title'>{title}</div>", unsafe_allow_html=True)
-                st.markdown(f"<div class='metric-value'>{value}</div>", unsafe_allow_html=True)
-                st.markdown("</div>", unsafe_allow_html=True)
+                card_html = f"""
+                <div class='glass-card'>
+                    <div class='metric-title'>{title}</div>
+                    <div class='metric-value'>{value}</div>
+                </div>
+                """
+                st.markdown(card_html, unsafe_allow_html=True)
 
         st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
         st.write("### Recent Transactions")

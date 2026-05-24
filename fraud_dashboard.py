@@ -12,7 +12,7 @@ st.set_page_config(page_title="Fraud Detection Dashboard", layout="wide")
 # ---------------------------------------------------------
 # LOAD DATA
 # ---------------------------------------------------------
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.realpath(__file__)) if "__file__" in globals() else os.getcwd()
 
 @st.cache_data
 def load_data():

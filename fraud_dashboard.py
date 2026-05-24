@@ -22,23 +22,35 @@ transactions_fe = load_data()
 iso = joblib.load(os.path.join(BASE_DIR, "isolation_forest_model.pkl"))
 
 # ---------------------------------------------------------
-# ULTRA GLASS SHADCN CSS + LAYOUT OVERRIDES
+# ULTRA GLASS SHADCN CSS + CENTERED LAYOUT
 # ---------------------------------------------------------
 st.markdown("""
 <style>
 
-/* Kill default Streamlit padding & gutters */
+/* CENTERED SHADCN LAYOUT */
 .main .block-container {
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-    max-width: 1400px;
+    max-width: 1320px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 1.5rem !important;
+    padding-bottom: 2rem !important;
 }
 
-/* Hide default header padding */
+/* Remove Streamlit header padding */
 header[data-testid="stHeader"] {
     background: transparent;
+    height: 0px;
+    padding: 0;
+    margin: 0;
+}
+
+/* Remove extra spacing */
+.css-1y4p8pa, .css-1v0mbdj, .css-1kyxreq {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
 }
 
 /* Background */
@@ -67,6 +79,7 @@ body {
         0 0 25px rgba(255, 0, 255, 0.25);
     padding: 18px 20px;
     transition: all 0.25s ease;
+    height: 100%;
 }
 
 .glass-card:hover {
@@ -108,11 +121,6 @@ section[data-testid="stSidebar"] {
     background: rgba(5, 5, 20, 0.85);
     backdrop-filter: blur(30px);
     border-right: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* Remove default chart background padding */
-.css-1kyxreq, .css-1v0mbdj {
-    background: transparent !important;
 }
 
 </style>
@@ -177,34 +185,24 @@ if page == "System Overview":
 
     st.markdown("<div class='section-header'>📊 Fraud Metrics</div>", unsafe_allow_html=True)
 
-    # Tier 1: Metrics row
-    col1, col2, col3, col4 = st.columns([1, 1, 1, 1.2])
+    # 4 equal-width metric cards
+    col1, col2, col3, col4 = st.columns(4)
 
-    with col1:
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='metric-title'>Total Transactions</div>", unsafe_allow_html=True)
-        st.markdown(f"<div class='metric-value'>{len(transactions_fe):,}</div>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+    metrics = [
+        ("Total Transactions", f"{len(transactions_fe):,}"),
+        ("Unique Customers", f"{transactions_fe['customer_id'].nunique():,}"),
+        ("Detected Anomalies", f"{transactions_fe['predicted_anomaly'].sum():,}"),
+        ("Avg Anomaly Score", f"{round(transactions_fe['anomaly_score'].mean(), 4)}")
+    ]
 
-    with col2:
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='metric-title'>Unique Customers</div>", unsafe_allow_html=True)
-        st.markdown(f"<div class='metric-value'>{transactions_fe['customer_id'].nunique():,}</div>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+    for col, (title, value) in zip([col1, col2, col3, col4], metrics):
+        with col:
+            st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+            st.markdown(f"<div class='metric-title'>{title}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='metric-value'>{value}</div>", unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
-    with col3:
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='metric-title'>Detected Anomalies</div>", unsafe_allow_html=True)
-        st.markdown(f"<div class='metric-value'>{transactions_fe['predicted_anomaly'].sum():,}</div>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    with col4:
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='metric-title'>Avg Anomaly Score</div>", unsafe_allow_html=True)
-        st.markdown(f"<div class='metric-value'>{round(transactions_fe['anomaly_score'].mean(), 4)}</div>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    # Tier 2: Chart + side metrics
+    # Chart + side metrics
     left, right = st.columns([2.2, 1])
 
     with left:
@@ -215,18 +213,18 @@ if page == "System Overview":
         st.markdown("</div>", unsafe_allow_html=True)
 
     with right:
-        metrics = {
+        side_metrics = {
             "High-Risk Customers": transactions_fe.groupby("customer_id")["anomaly_score"].mean().gt(0.7).sum(),
             "Flagged Transactions": transactions_fe["predicted_anomaly"].sum(),
             "Model Version": "v1.0.0"
         }
-        for title, value in metrics.items():
+        for title, value in side_metrics.items():
             st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
             st.markdown(f"<div class='metric-title'>{title}</div>", unsafe_allow_html=True)
             st.markdown(f"<div class='metric-value'>{value}</div>", unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
 
-    # Tier 3: High-risk customers table
+    # High-risk customers
     st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
 
     risk_df = (
@@ -279,25 +277,20 @@ elif page == "Customer Details":
     cust_df = transactions_fe[transactions_fe["customer_id"] == customer_id]
 
     if not cust_df.empty:
-        col1, col2, col3 = st.columns([1, 1, 1])
+        col1, col2, col3 = st.columns(3)
 
-        with col1:
-            st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-            st.markdown("<div class='metric-title'>Total Transactions</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='metric-value'>{len(cust_df)}</div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+        details = [
+            ("Total Transactions", len(cust_df)),
+            ("Avg Anomaly Score", round(cust_df["anomaly_score"].mean(), 4)),
+            ("Detected Anomalies", cust_df["predicted_anomaly"].sum())
+        ]
 
-        with col2:
-            st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-            st.markdown("<div class='metric-title'>Avg Anomaly Score</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='metric-value'>{round(cust_df['anomaly_score'].mean(), 4)}</div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
-
-        with col3:
-            st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-            st.markdown("<div class='metric-title'>Detected Anomalies</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='metric-value'>{cust_df['predicted_anomaly'].sum()}</div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+        for col, (title, value) in zip([col1, col2, col3], details):
+            with col:
+                st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+                st.markdown(f"<div class='metric-title'>{title}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='metric-value'>{value}</div>", unsafe_allow_html=True)
+                st.markdown("</div>", unsafe_allow_html=True)
 
         st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
         st.write("### Recent Transactions")

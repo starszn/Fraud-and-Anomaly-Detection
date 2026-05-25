@@ -38,7 +38,7 @@ st.markdown("""
     padding: 0 !important;
 }
 
-body {
+.stApp {
     background: linear-gradient(
         135deg,
         #0a021a 0%,

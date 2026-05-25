@@ -216,13 +216,14 @@ if page == "System Overview":
     # Chart + side metrics
     left, right = st.columns([2.2, 1])
 
-    # CHART INSIDE GLASS CARD
+    # ⭐ CHART INSIDE GLASS CARD (corrected)
     with left:
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='section-header'>📈 Anomaly Score Distribution</div>", unsafe_allow_html=True)
-        fig = glass_histogram(transactions_fe)
-        st.plotly_chart(fig, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        with st.container():
+            st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+            st.markdown("<div class='section-header'>📈 Anomaly Score Distribution</div>", unsafe_allow_html=True)
+            fig = glass_histogram(transactions_fe)
+            st.plotly_chart(fig, use_container_width=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
     # RIGHT-SIDE METRICS
     with right:
@@ -241,7 +242,7 @@ if page == "System Overview":
             """
             st.markdown(card_html, unsafe_allow_html=True)
 
-    # HIGHEST-RISK TABLE INSIDE GLASS CARD
+    # ⭐ HIGHEST-RISK TABLE INSIDE GLASS CARD (corrected)
     st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
 
     risk_df = (
@@ -251,9 +252,10 @@ if page == "System Overview":
         .reset_index()
     )
 
-    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-    st.dataframe(risk_df.head(20), use_container_width=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    with st.container():
+        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+        st.dataframe(risk_df.head(20), use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # CUSTOMER SEARCH
@@ -333,6 +335,7 @@ elif page == "Risk Ranking":
         .reset_index()
     )
 
-    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-    st.dataframe(risk_df.head(20), use_container_width=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    with st.container():
+        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+        st.dataframe(risk_df.head(20), use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)

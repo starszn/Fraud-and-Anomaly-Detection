@@ -79,7 +79,7 @@ body {
         0 0 25px rgba(255, 0, 255, 0.35),
         0 4px 30px rgba(0, 0, 0, 0.45);
     padding: 20px;
-    height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -203,46 +203,45 @@ if page == "System Overview":
 
         for col, (title, value) in zip([col1, col2, col3, col4], metrics):
             with col:
-                card_html = f"""
+                st.markdown(f"""
                 <div class='glass-card'>
                     <div class='metric-title'>{title}</div>
                     <div class='metric-value'>{value}</div>
                 </div>
-                """
-                st.markdown(card_html, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # Chart + side metrics
-    left, right = st.columns([2.2, 1])
+    # ⭐ FULL-WIDTH CHART INSIDE GLASS CARD
+    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>📈 Anomaly Score Distribution</div>", unsafe_allow_html=True)
 
-    # ⭐ CHART INSIDE GLASS CARD (corrected)
-    with left:
-        with st.container():
-            st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-            st.markdown("<div class='section-header'>📈 Anomaly Score Distribution</div>", unsafe_allow_html=True)
-            fig = glass_histogram(transactions_fe)
-            st.plotly_chart(fig, use_container_width=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+    with st.container():
+        fig = glass_histogram(transactions_fe)
+        st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
     # RIGHT-SIDE METRICS
-    with right:
-        side_metrics = {
-            "High-Risk Customers": transactions_fe.groupby("customer_id")["anomaly_score"].mean().gt(0.7).sum(),
-            "Flagged Transactions": transactions_fe["predicted_anomaly"].sum(),
-            "Model Version": "v1.0.0"
-        }
+    st.markdown("<br>", unsafe_allow_html=True)
+    colA, colB, colC = st.columns(3)
 
-        for title, value in side_metrics.items():
-            card_html = f"""
+    side_metrics = [
+        ("High-Risk Customers", transactions_fe.groupby("customer_id")["anomaly_score"].mean().gt(0.7).sum()),
+        ("Flagged Transactions", transactions_fe["predicted_anomaly"].sum()),
+        ("Model Version", "v1.0.0")
+    ]
+
+    for col, (title, value) in zip([colA, colB, colC], side_metrics):
+        with col:
+            st.markdown(f"""
             <div class='glass-card'>
                 <div class='metric-title'>{title}</div>
                 <div class='metric-value'>{value}</div>
             </div>
-            """
-            st.markdown(card_html, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
 
-    # ⭐ HIGHEST-RISK TABLE INSIDE GLASS CARD (corrected)
+    # ⭐ FULL-WIDTH HIGHEST-RISK TABLE INSIDE GLASS CARD
     st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
 
     risk_df = (
@@ -252,10 +251,12 @@ if page == "System Overview":
         .reset_index()
     )
 
+    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+
     with st.container():
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
         st.dataframe(risk_df.head(20), use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # CUSTOMER SEARCH
@@ -306,13 +307,12 @@ elif page == "Customer Details":
 
         for col, (title, value) in zip([col1, col2, col3], details):
             with col:
-                card_html = f"""
+                st.markdown(f"""
                 <div class='glass-card'>
                     <div class='metric-title'>{title}</div>
                     <div class='metric-value'>{value}</div>
                 </div>
-                """
-                st.markdown(card_html, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
 
         st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
         st.write("### Recent Transactions")
@@ -335,7 +335,9 @@ elif page == "Risk Ranking":
         .reset_index()
     )
 
+    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+
     with st.container():
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
         st.dataframe(risk_df.head(20), use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)

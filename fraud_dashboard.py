@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 import joblib
 import os
+import altair as alt
 import plotly.express as px
-from streamlit.components.v1 import html
 
 # ---------------------------------------------------------
 # PAGE CONFIG
@@ -26,27 +26,7 @@ transactions_fe = load_data()
 iso = joblib.load(os.path.join(BASE_DIR, "isolation_forest_model.pkl"))
 
 # ---------------------------------------------------------
-# CUSTOM PLOTLY THEME
-# ---------------------------------------------------------
-def glass_histogram(df):
-    fig = px.histogram(
-        df,
-        x="anomaly_score",
-        nbins=50,
-        color_discrete_sequence=["#FF4FFB"]
-    )
-    fig.update_layout(
-        plot_bgcolor="rgba(0,0,0,0)",
-        paper_bgcolor="rgba(0,0,0,0)",
-        font_color="#EDE6FF",
-        xaxis=dict(showgrid=False, zeroline=False),
-        yaxis=dict(showgrid=False, zeroline=False),
-        margin=dict(l=10, r=10, t=10, b=10)
-    )
-    return fig
-
-# ---------------------------------------------------------
-# CSS (Glass + Hover Lift + FIXED overflow)
+# CSS (Glass + Hover Lift)
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -176,28 +156,35 @@ if page == "System Overview":
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # ⭐ FULL-WIDTH CHART INSIDE GLASS CARD (PLOTLY-JS FIX)
-    fig = glass_histogram(transactions_fe)
-    fig_json = fig.to_json()
+    # ---------------------------------------------------------
+    # ⭐ ALTAR PIE CHART (INSIDE GLASS CARD)
+    # ---------------------------------------------------------
+    pie_data = transactions_fe.copy()
+    pie_data["bucket"] = pd.cut(
+        pie_data["anomaly_score"],
+        bins=[0, 0.2, 0.4, 0.6, 0.8, 1],
+        labels=["0–0.2", "0.2–0.4", "0.4–0.6", "0.6–0.8", "0.8–1.0"]
+    )
 
-    chart_html = f"""
-    <div class='glass-card'>
-        <div class='section-header'>📈 Anomaly Score Distribution</div>
-        <div id="chart"></div>
-    </div>
+    pie_chart = (
+        alt.Chart(pie_data)
+        .mark_arc(outerRadius=120)
+        .encode(
+            theta="count():Q",
+            color=alt.Color("bucket:N", scale=alt.Scale(scheme="magma")),
+            tooltip=["bucket:N", "count():Q"]
+        )
+        .properties(height=400)
+    )
 
-    <!-- Load Plotly JS -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>📈 Anomaly Score Distribution</div>", unsafe_allow_html=True)
+    st.altair_chart(pie_chart, use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    <script>
-        const fig = {fig_json};
-        Plotly.newPlot('chart', fig.data, fig.layout);
-    </script>
-    """
-
-    html(chart_html, height=500)
-
-    # Side metrics
+    # ---------------------------------------------------------
+    # SIDE METRICS
+    # ---------------------------------------------------------
     st.markdown("<br>", unsafe_allow_html=True)
     colA, colB, colC = st.columns(3)
 
@@ -219,7 +206,9 @@ if page == "System Overview":
                 unsafe_allow_html=True
             )
 
-    # ⭐ FULL-WIDTH TABLE INSIDE GLASS CARD (HTML TABLE FIX)
+    # ---------------------------------------------------------
+    # ⭐ ALTAR TABLE (INSIDE GLASS CARD)
+    # ---------------------------------------------------------
     st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
 
     risk_df = (
@@ -229,13 +218,21 @@ if page == "System Overview":
         .reset_index()
     )
 
-    table_html = f"""
-    <div class='glass-card'>
-        {risk_df.head(20).to_html(index=False)}
-    </div>
-    """
+    table_chart = (
+        alt.Chart(risk_df.head(20))
+        .mark_text(align="left", baseline="middle", dx=5)
+        .encode(
+            y=alt.Y("customer_id:N", sort="-x", title="Customer ID"),
+            x=alt.X("anomaly_score:Q", title="Anomaly Score"),
+            text=alt.Text("anomaly_score:Q", format=".4f"),
+            color=alt.Color("anomaly_score:Q", scale=alt.Scale(scheme="inferno"))
+        )
+        .properties(height=400)
+    )
 
-    html(table_html, height=600, scrolling=True)
+    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+    st.altair_chart(table_chart, use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # CUSTOMER SEARCH
@@ -317,10 +314,6 @@ elif page == "Risk Ranking":
         .reset_index()
     )
 
-    table_html = f"""
-    <div class='glass-card'>
-        {risk_df.head(20).to_html(index=False)}
-    </div>
-    """
-
-    html(table_html, height=600, scrolling=True)
+    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+    st.dataframe(risk_df.head(20), use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)

@@ -192,7 +192,7 @@ if page == "System Overview":
             )
 
     # ---------------------------------------------------------
-    # PIE CHART — wrapped in st.container() for CSS glass targeting
+    # PIE CHART — st.container() lets CSS :has(.vega-embed) target it
     # ---------------------------------------------------------
     pie_data = transactions_fe.copy()
     pie_data["bucket"] = pd.cut(
@@ -212,9 +212,6 @@ if page == "System Overview":
         .properties(height=400)
     )
 
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # st.container() creates the stVerticalBlock the CSS :has(.vega-embed) selector targets
     with st.container():
         st.markdown("<div class='section-header'>📈 Anomaly Score Distribution</div>", unsafe_allow_html=True)
         st.altair_chart(pie_chart, use_container_width=True)
@@ -244,7 +241,7 @@ if page == "System Overview":
             )
 
     # ---------------------------------------------------------
-    # TABLE CHART — wrapped in st.container() for CSS glass targeting
+    # DATAFRAME — st.container() lets CSS :has(.stDataFrame) target it
     # ---------------------------------------------------------
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -255,22 +252,9 @@ if page == "System Overview":
         .reset_index()
     )
 
-    table_chart = (
-        alt.Chart(risk_df.head(20))
-        .mark_text(align="left", baseline="middle", dx=5)
-        .encode(
-            y=alt.Y("customer_id:N", sort="-x", title="Customer ID"),
-            x=alt.X("anomaly_score:Q", title="Anomaly Score"),
-            text=alt.Text("anomaly_score:Q", format=".4f"),
-            color=alt.Color("anomaly_score:Q", scale=alt.Scale(scheme="inferno"))
-        )
-        .properties(height=400)
-    )
-
-    # st.container() creates the stVerticalBlock the CSS :has(.vega-embed) selector targets
     with st.container():
         st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
-        st.altair_chart(table_chart, use_container_width=True)
+        st.dataframe(risk_df.head(20), use_container_width=True)
 
 # ---------------------------------------------------------
 # CUSTOMER SEARCH
@@ -287,7 +271,7 @@ elif page == "Customer Search":
             customer_id = int(customer_id)
             cust_df = transactions_fe[transactions_fe["customer_id"] == customer_id]
 
-            # st.container() creates the stVerticalBlock the CSS :has(.stDataFrame) selector targets
+            # st.container() lets CSS :has(.stDataFrame) target it
             with st.container():
                 if cust_df.empty:
                     st.warning("Customer not found.")
@@ -331,7 +315,7 @@ elif page == "Customer Details":
                     unsafe_allow_html=True
                 )
 
-        # st.container() creates the stVerticalBlock the CSS :has(.stDataFrame) selector targets
+        # st.container() lets CSS :has(.stDataFrame) target it
         with st.container():
             st.write("### Recent Transactions")
             st.dataframe(cust_df.tail(20), use_container_width=True)
@@ -352,6 +336,6 @@ elif page == "Risk Ranking":
         .reset_index()
     )
 
-    # st.container() creates the stVerticalBlock the CSS :has(.stDataFrame) selector targets
+    # st.container() lets CSS :has(.stDataFrame) target it
     with st.container():
         st.dataframe(risk_df.head(20), use_container_width=True)

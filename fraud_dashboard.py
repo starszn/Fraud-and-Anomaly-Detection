@@ -3,7 +3,6 @@ import pandas as pd
 import joblib
 import os
 import plotly.express as px
-from streamlit.components.v1 import html
 
 # ---------------------------------------------------------
 # PAGE CONFIG
@@ -46,7 +45,7 @@ def glass_histogram(df):
     return fig
 
 # ---------------------------------------------------------
-# CSS (Glass + Hover Lift)
+# CSS (Glass + Hover Lift + FIXED overflow)
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -72,11 +71,17 @@ body {
 .glass-card {
     background: rgba(255, 255, 255, 0.10);
     backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.18);
     padding: 20px;
     width: 100%;
+    display: flex;
+    flex-direction: column;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+    /* ⭐ THE FIX ⭐ */
+    overflow: hidden;
 }
 
 .glass-card:hover {
@@ -172,29 +177,14 @@ if page == "System Overview":
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # ---------------------------------------------------------
-    # FULL-WIDTH CHART INSIDE GLASS CARD (FINAL WORKING FIX)
-    # ---------------------------------------------------------
+    # ⭐ FULL-WIDTH CHART INSIDE GLASS CARD (NOW FIXED)
+    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>📈 Anomaly Score Distribution</div>", unsafe_allow_html=True)
     fig = glass_histogram(transactions_fe)
-    fig_json = fig.to_json()
+    st.plotly_chart(fig, use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    chart_html = f"""
-    <div class='glass-card'>
-        <div class='section-header'>📈 Anomaly Score Distribution</div>
-        <div id="chart"></div>
-    </div>
-
-    <script>
-        const fig = {fig_json};
-        Plotly.newPlot('chart', fig.data, fig.layout);
-    </script>
-    """
-
-    html(chart_html, height=500)
-
-    # ---------------------------------------------------------
-    # SIDE METRICS
-    # ---------------------------------------------------------
+    # Side metrics
     st.markdown("<br>", unsafe_allow_html=True)
     colA, colB, colC = st.columns(3)
 
@@ -216,9 +206,7 @@ if page == "System Overview":
                 unsafe_allow_html=True
             )
 
-    # ---------------------------------------------------------
-    # FULL-WIDTH TABLE INSIDE GLASS CARD (FINAL WORKING FIX)
-    # ---------------------------------------------------------
+    # ⭐ FULL-WIDTH TABLE INSIDE GLASS CARD (NOW FIXED)
     st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
 
     risk_df = (
@@ -228,13 +216,9 @@ if page == "System Overview":
         .reset_index()
     )
 
-    table_html = f"""
-    <div class='glass-card'>
-        {risk_df.head(20).to_html(index=False)}
-    </div>
-    """
-
-    html(table_html, height=600, scrolling=True)
+    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+    st.dataframe(risk_df.head(20), use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # CUSTOMER SEARCH
@@ -316,10 +300,6 @@ elif page == "Risk Ranking":
         .reset_index()
     )
 
-    table_html = f"""
-    <div class='glass-card'>
-        {risk_df.head(20).to_html(index=False)}
-    </div>
-    """
-
-    html(table_html, height=600, scrolling=True)
+    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+    st.dataframe(risk_df.head(20), use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)

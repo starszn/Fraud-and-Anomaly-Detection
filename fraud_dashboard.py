@@ -26,11 +26,12 @@ transactions_fe = load_data()
 iso = joblib.load(os.path.join(BASE_DIR, "isolation_forest_model.pkl"))
 
 # ---------------------------------------------------------
-# CSS (Ultra Glass + Gradient Background)
+# CSS (Liquid Glass — iOS 26 / reference style)
 # ---------------------------------------------------------
 st.markdown("""
 <style>
 
+/* ── Background ── */
 .stApp {
     background: linear-gradient(
         135deg,
@@ -46,74 +47,50 @@ st.markdown("""
     font-family: 'Inter', sans-serif;
 }
 
-/* ULTRA GLASS — Metric Cards */
-.glass-card {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(80px) saturate(300%);
-    -webkit-backdrop-filter: blur(80px) saturate(300%);
-    border-radius: 22px;
-    border: 1px solid rgba(255, 255, 255, 0.35);
+/* ── Shared liquid-glass mixin ── */
+.glass-card,
+[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed),
+[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.stDataFrame) {
+    /* Near-invisible fill so the gradient bleeds through */
+    background: rgba(255, 255, 255, 0.06);
+
+    /* Heavy blur + saturation boost = frosted-glass depth */
+    backdrop-filter: blur(60px) saturate(220%) brightness(1.08);
+    -webkit-backdrop-filter: blur(60px) saturate(220%) brightness(1.08);
+
+    /* Soft bright border — thicker top/left for light-source illusion */
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.30);
+    box-shadow:
+        /* inner top-left highlight */
+        inset 0 1px 0 rgba(255, 255, 255, 0.45),
+        inset 1px 0 0 rgba(255, 255, 255, 0.20),
+        /* outer ambient glow */
+        0 8px 32px rgba(0, 0, 0, 0.35),
+        0 2px 8px  rgba(0, 0, 0, 0.20);
+
     padding: 22px;
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    transition: transform 0.28s ease, box-shadow 0.28s ease;
     overflow: hidden;
 }
 
-.glass-card:hover {
-    transform: translateY(-8px);
-    box-shadow:
-        0 0 55px rgba(255, 0, 255, 0.55),
-        0 12px 60px rgba(0, 0, 0, 0.65);
-}
-
-/* ULTRA GLASS — Altair Chart Containers */
-[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed) {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(80px) saturate(300%);
-    -webkit-backdrop-filter: blur(80px) saturate(300%);
-    border-radius: 22px;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    padding: 22px;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    overflow: hidden;
-}
-
-[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed):hover {
-    transform: translateY(-8px);
-    box-shadow:
-        0 0 55px rgba(255, 0, 255, 0.55),
-        0 12px 60px rgba(0, 0, 0, 0.65);
-}
-
-/* ULTRA GLASS — DataFrame Containers */
-[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.stDataFrame) {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(80px) saturate(300%);
-    -webkit-backdrop-filter: blur(80px) saturate(300%);
-    border-radius: 22px;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    padding: 22px;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    overflow: hidden;
-}
-
+/* ── Hover lift ── */
+.glass-card:hover,
+[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed):hover,
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.stDataFrame):hover {
     transform: translateY(-8px);
     box-shadow:
-        0 0 55px rgba(255, 0, 255, 0.55),
-        0 12px 60px rgba(0, 0, 0, 0.65);
+        inset 0 1px 0 rgba(255, 255, 255, 0.55),
+        inset 1px 0 0 rgba(255, 255, 255, 0.25),
+        0 0 55px rgba(180, 80, 255, 0.50),
+        0 16px 60px rgba(0, 0, 0, 0.55);
 }
 
-.equal-row {
+/* ── metric card flex layout ── */
+.glass-card {
     display: flex;
-    gap: 16px;
-}
-
-.equal-row > div {
-    flex: 1;
-    display: flex;
+    flex-direction: column;
 }
 
 .section-header {
@@ -125,14 +102,17 @@ st.markdown("""
 
 .metric-title {
     font-size: 13px;
-    color: #CBB4FF;
+    color: rgba(220, 200, 255, 0.80);
     margin-bottom: 6px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 .metric-value {
     font-size: 30px;
     font-weight: 700;
     color: #FF4FFB;
+    text-shadow: 0 0 20px rgba(255, 79, 251, 0.45);
 }
 
 </style>

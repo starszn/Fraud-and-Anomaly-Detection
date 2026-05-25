@@ -3,6 +3,7 @@ import pandas as pd
 import joblib
 import os
 import plotly.express as px
+from streamlit.components.v1 import html
 
 # ---------------------------------------------------------
 # PAGE CONFIG
@@ -25,145 +26,7 @@ transactions_fe = load_data()
 iso = joblib.load(os.path.join(BASE_DIR, "isolation_forest_model.pkl"))
 
 # ---------------------------------------------------------
-# ULTRA GLASS SHADCN CSS + CENTERED LAYOUT + HOVER LIFT
-# ---------------------------------------------------------
-st.markdown("""
-<style>
-
-/* CENTERED SHADCN LAYOUT */
-.main .block-container {
-    max-width: 1320px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0 !important;
-}
-
-/* Remove Streamlit header padding */
-header[data-testid="stHeader"] {
-    background: transparent;
-    height: 0px;
-    padding: 0;
-    margin: 0;
-}
-
-/* Remove Streamlit internal padding */
-[data-testid="stAppViewContainer"],
-[data-testid="stVerticalBlock"],
-[data-testid="column"] {
-    background: transparent !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-/* Background */
-body {
-    background: radial-gradient(circle at top left,
-        #050510 0%,
-        #09071a 35%,
-        #120a2a 65%,
-        #1e0f3f 100%);
-    background-attachment: fixed;
-    color: #EDE6FF;
-    font-family: 'Inter', sans-serif;
-    letter-spacing: -0.01em;
-}
-
-/* ULTRA GLASS — SHADCN STYLE */
-.glass-card {
-    background: rgba(255, 255, 255, 0.10);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow:
-        0 0 25px rgba(255, 0, 255, 0.35),
-        0 4px 30px rgba(0, 0, 0, 0.45);
-    padding: 20px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-/* HOVER LIFT EFFECT */
-.glass-card:hover {
-    transform: translateY(-6px);
-    box-shadow:
-        0 0 35px rgba(255, 0, 255, 0.45),
-        0 6px 40px rgba(0, 0, 0, 0.55);
-}
-
-/* Equal-height flexbox row */
-.equal-row {
-    display: flex;
-    gap: 16px;
-}
-
-.equal-row > div {
-    flex: 1;
-    display: flex;
-}
-
-/* HEADERS */
-.section-header {
-    font-size: 24px;
-    font-weight: 600;
-    color: #F5E8FF;
-    margin-bottom: 10px;
-}
-
-/* METRICS */
-.metric-title {
-    font-size: 13px;
-    color: #CBB4FF;
-    margin-bottom: 6px;
-}
-
-.metric-value {
-    font-size: 30px;
-    font-weight: 700;
-    color: #FF4FFB;
-}
-
-/* DataFrame text */
-[data-testid="stDataFrame"] {
-    color: #EDE6FF !important;
-}
-
-/* Sidebar */
-section[data-testid="stSidebar"] {
-    background: rgba(5, 5, 20, 0.85);
-    backdrop-filter: blur(30px);
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-# ---------------------------------------------------------
-# SIDEBAR
-# ---------------------------------------------------------
-st.sidebar.markdown(
-    "<h2 style='color:#E0D8FF; margin-bottom: 1rem;'>📊 Dashboard</h2>",
-    unsafe_allow_html=True
-)
-
-page = st.sidebar.radio(
-    "",
-    ["System Overview", "Customer Search", "Customer Details", "Risk Ranking"],
-    index=0
-)
-
-# ---------------------------------------------------------
-# HEADER
-# ---------------------------------------------------------
-st.markdown(
-    "<h1 style='text-align:center; color:#F5E8FF; margin-bottom: 24px;'>🔍 Fraud Detection Dashboard</h1>",
-    unsafe_allow_html=True
-)
-
-# ---------------------------------------------------------
-# CUSTOM PLOTLY THEME (GLASS STYLE)
+# CUSTOM PLOTLY THEME
 # ---------------------------------------------------------
 def glass_histogram(df):
     fig = px.histogram(
@@ -176,11 +39,105 @@ def glass_histogram(df):
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
         font_color="#EDE6FF",
-        xaxis=dict(showgrid=False, zeroline=False, linecolor="rgba(255,255,255,0.25)"),
-        yaxis=dict(showgrid=False, zeroline=False, linecolor="rgba(255,255,255,0.25)"),
+        xaxis=dict(showgrid=False, zeroline=False),
+        yaxis=dict(showgrid=False, zeroline=False),
         margin=dict(l=10, r=10, t=10, b=10)
     )
     return fig
+
+# ---------------------------------------------------------
+# CSS (Glass + Hover Lift)
+# ---------------------------------------------------------
+st.markdown("""
+<style>
+
+.main .block-container {
+    max-width: 1320px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 !important;
+}
+
+body {
+    background: radial-gradient(circle at top left,
+        #050510 0%,
+        #09071a 35%,
+        #120a2a 65%,
+        #1e0f3f 100%);
+    background-attachment: fixed;
+    color: #EDE6FF;
+    font-family: 'Inter', sans-serif;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(40px) saturate(180%);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 20px;
+    width: 100%;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-6px);
+    box-shadow:
+        0 0 35px rgba(255, 0, 255, 0.45),
+        0 6px 40px rgba(0, 0, 0, 0.55);
+}
+
+.equal-row {
+    display: flex;
+    gap: 16px;
+}
+
+.equal-row > div {
+    flex: 1;
+    display: flex;
+}
+
+.section-header {
+    font-size: 24px;
+    font-weight: 600;
+    color: #F5E8FF;
+    margin-bottom: 10px;
+}
+
+.metric-title {
+    font-size: 13px;
+    color: #CBB4FF;
+    margin-bottom: 6px;
+}
+
+.metric-value {
+    font-size: 30px;
+    font-weight: 700;
+    color: #FF4FFB;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------
+# SIDEBAR
+# ---------------------------------------------------------
+st.sidebar.markdown(
+    "<h2 style='color:#E0D8FF;'>📊 Dashboard</h2>",
+    unsafe_allow_html=True
+)
+
+page = st.sidebar.radio(
+    "",
+    ["System Overview", "Customer Search", "Customer Details", "Risk Ranking"]
+)
+
+# ---------------------------------------------------------
+# HEADER
+# ---------------------------------------------------------
+st.markdown(
+    "<h1 style='text-align:center; color:#F5E8FF;'>🔍 Fraud Detection Dashboard</h1>",
+    unsafe_allow_html=True
+)
 
 # ---------------------------------------------------------
 # SYSTEM OVERVIEW
@@ -189,7 +146,7 @@ if page == "System Overview":
 
     st.markdown("<div class='section-header'>📊 Fraud Metrics</div>", unsafe_allow_html=True)
 
-    # 4 equal-width metric cards
+    # Metric cards
     with st.container():
         st.markdown("<div class='equal-row'>", unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
@@ -203,26 +160,41 @@ if page == "System Overview":
 
         for col, (title, value) in zip([col1, col2, col3, col4], metrics):
             with col:
-                st.markdown(f"""
-                <div class='glass-card'>
-                    <div class='metric-title'>{title}</div>
-                    <div class='metric-value'>{value}</div>
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown(
+                    f"""
+                    <div class='glass-card'>
+                        <div class='metric-title'>{title}</div>
+                        <div class='metric-value'>{value}</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # ⭐ FULL-WIDTH CHART INSIDE GLASS CARD
-    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-    st.markdown("<div class='section-header'>📈 Anomaly Score Distribution</div>", unsafe_allow_html=True)
+    # ---------------------------------------------------------
+    # FULL-WIDTH CHART INSIDE GLASS CARD (FINAL WORKING FIX)
+    # ---------------------------------------------------------
+    fig = glass_histogram(transactions_fe)
+    fig_json = fig.to_json()
 
-    with st.container():
-        fig = glass_histogram(transactions_fe)
-        st.plotly_chart(fig, use_container_width=True)
+    chart_html = f"""
+    <div class='glass-card'>
+        <div class='section-header'>📈 Anomaly Score Distribution</div>
+        <div id="chart"></div>
+    </div>
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    <script>
+        const fig = {fig_json};
+        Plotly.newPlot('chart', fig.data, fig.layout);
+    </script>
+    """
 
-    # RIGHT-SIDE METRICS
+    html(chart_html, height=500)
+
+    # ---------------------------------------------------------
+    # SIDE METRICS
+    # ---------------------------------------------------------
     st.markdown("<br>", unsafe_allow_html=True)
     colA, colB, colC = st.columns(3)
 
@@ -234,14 +206,19 @@ if page == "System Overview":
 
     for col, (title, value) in zip([colA, colB, colC], side_metrics):
         with col:
-            st.markdown(f"""
-            <div class='glass-card'>
-                <div class='metric-title'>{title}</div>
-                <div class='metric-value'>{value}</div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(
+                f"""
+                <div class='glass-card'>
+                    <div class='metric-title'>{title}</div>
+                    <div class='metric-value'>{value}</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
-    # ⭐ FULL-WIDTH HIGHEST-RISK TABLE INSIDE GLASS CARD
+    # ---------------------------------------------------------
+    # FULL-WIDTH TABLE INSIDE GLASS CARD (FINAL WORKING FIX)
+    # ---------------------------------------------------------
     st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
 
     risk_df = (
@@ -251,12 +228,13 @@ if page == "System Overview":
         .reset_index()
     )
 
-    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+    table_html = f"""
+    <div class='glass-card'>
+        {risk_df.head(20).to_html(index=False)}
+    </div>
+    """
 
-    with st.container():
-        st.dataframe(risk_df.head(20), use_container_width=True)
-
-    st.markdown("</div>", unsafe_allow_html=True)
+    html(table_html, height=600, scrolling=True)
 
 # ---------------------------------------------------------
 # CUSTOMER SEARCH
@@ -277,12 +255,12 @@ elif page == "Customer Search":
             if cust_df.empty:
                 st.warning("Customer not found.")
             else:
-                st.success(f"Found {len(cust_df)} transactions for customer {customer_id}.")
+                st.success(f"Found {len(cust_df)} transactions.")
                 st.dataframe(cust_df.head(20), use_container_width=True)
             st.markdown("</div>", unsafe_allow_html=True)
 
         except:
-            st.error("Please enter a valid numeric customer ID.")
+            st.error("Please enter a valid numeric ID.")
 
 # ---------------------------------------------------------
 # CUSTOMER DETAILS
@@ -307,12 +285,15 @@ elif page == "Customer Details":
 
         for col, (title, value) in zip([col1, col2, col3], details):
             with col:
-                st.markdown(f"""
-                <div class='glass-card'>
-                    <div class='metric-title'>{title}</div>
-                    <div class='metric-value'>{value}</div>
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown(
+                    f"""
+                    <div class='glass-card'>
+                        <div class='metric-title'>{title}</div>
+                        <div class='metric-value'>{value}</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
         st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
         st.write("### Recent Transactions")
@@ -335,9 +316,10 @@ elif page == "Risk Ranking":
         .reset_index()
     )
 
-    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+    table_html = f"""
+    <div class='glass-card'>
+        {risk_df.head(20).to_html(index=False)}
+    </div>
+    """
 
-    with st.container():
-        st.dataframe(risk_df.head(20), use_container_width=True)
-
-    st.markdown("</div>", unsafe_allow_html=True)
+    html(table_html, height=600, scrolling=True)

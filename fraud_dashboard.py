@@ -3,6 +3,7 @@ import pandas as pd
 import joblib
 import os
 import plotly.express as px
+from streamlit.components.v1 import html
 
 # ---------------------------------------------------------
 # PAGE CONFIG
@@ -79,8 +80,6 @@ body {
     display: flex;
     flex-direction: column;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
-
-    /* ⭐ THE FIX ⭐ */
     overflow: hidden;
 }
 
@@ -177,12 +176,23 @@ if page == "System Overview":
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # ⭐ FULL-WIDTH CHART INSIDE GLASS CARD (NOW FIXED)
-    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-    st.markdown("<div class='section-header'>📈 Anomaly Score Distribution</div>", unsafe_allow_html=True)
+    # ⭐ FULL-WIDTH CHART INSIDE GLASS CARD (PLOTLY-JS FIX)
     fig = glass_histogram(transactions_fe)
-    st.plotly_chart(fig, use_container_width=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    fig_json = fig.to_json()
+
+    chart_html = f"""
+    <div class='glass-card'>
+        <div class='section-header'>📈 Anomaly Score Distribution</div>
+        <div id="chart"></div>
+    </div>
+
+    <script>
+        const fig = {fig_json};
+        Plotly.newPlot('chart', fig.data, fig.layout);
+    </script>
+    """
+
+    html(chart_html, height=500)
 
     # Side metrics
     st.markdown("<br>", unsafe_allow_html=True)
@@ -206,7 +216,7 @@ if page == "System Overview":
                 unsafe_allow_html=True
             )
 
-    # ⭐ FULL-WIDTH TABLE INSIDE GLASS CARD (NOW FIXED)
+    # ⭐ FULL-WIDTH TABLE INSIDE GLASS CARD (HTML TABLE FIX)
     st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
 
     risk_df = (
@@ -216,9 +226,13 @@ if page == "System Overview":
         .reset_index()
     )
 
-    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-    st.dataframe(risk_df.head(20), use_container_width=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    table_html = f"""
+    <div class='glass-card'>
+        {risk_df.head(20).to_html(index=False)}
+    </div>
+    """
+
+    html(table_html, height=600, scrolling=True)
 
 # ---------------------------------------------------------
 # CUSTOMER SEARCH
@@ -300,6 +314,10 @@ elif page == "Risk Ranking":
         .reset_index()
     )
 
-    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-    st.dataframe(risk_df.head(20), use_container_width=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    table_html = f"""
+    <div class='glass-card'>
+        {risk_df.head(20).to_html(index=False)}
+    </div>
+    """
+
+    html(table_html, height=600, scrolling=True)

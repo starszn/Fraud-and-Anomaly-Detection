@@ -186,6 +186,9 @@ if page == "System Overview":
         <div id="chart"></div>
     </div>
 
+    <!-- Load Plotly JS -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
     <script>
         const fig = {fig_json};
         Plotly.newPlot('chart', fig.data, fig.layout);

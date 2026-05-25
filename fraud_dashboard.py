@@ -25,7 +25,7 @@ transactions_fe = load_data()
 iso = joblib.load(os.path.join(BASE_DIR, "isolation_forest_model.pkl"))
 
 # ---------------------------------------------------------
-# ULTRA GLASS SHADCN CSS + CENTERED LAYOUT
+# ULTRA GLASS SHADCN CSS + CENTERED LAYOUT + FLOATING ANIMATION
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -68,6 +68,13 @@ body {
     letter-spacing: -0.01em;
 }
 
+/* FLOATING ANIMATION */
+@keyframes floaty {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+    100% { transform: translateY(0px); }
+}
+
 /* ULTRA GLASS — SHADCN STYLE */
 .glass-card {
     background: rgba(255, 255, 255, 0.10);
@@ -82,6 +89,7 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
+    animation: floaty 6s ease-in-out infinite;
 }
 
 /* Equal-height flexbox row */
@@ -167,18 +175,8 @@ def glass_histogram(df):
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
         font_color="#EDE6FF",
-        xaxis=dict(
-            showgrid=False,
-            zeroline=False,
-            linecolor="rgba(255,255,255,0.25)",
-            tickfont=dict(color="#CBB4FF")
-        ),
-        yaxis=dict(
-            showgrid=False,
-            zeroline=False,
-            linecolor="rgba(255,255,255,0.25)",
-            tickfont=dict(color="#CBB4FF")
-        ),
+        xaxis=dict(showgrid=False, zeroline=False, linecolor="rgba(255,255,255,0.25)"),
+        yaxis=dict(showgrid=False, zeroline=False, linecolor="rgba(255,255,255,0.25)"),
         margin=dict(l=10, r=10, t=10, b=10)
     )
     return fig
@@ -217,6 +215,7 @@ if page == "System Overview":
     # Chart + side metrics
     left, right = st.columns([2.2, 1])
 
+    # CHART INSIDE GLASS CARD
     with left:
         st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
         st.markdown("<div class='section-header'>📈 Anomaly Score Distribution</div>", unsafe_allow_html=True)
@@ -224,6 +223,7 @@ if page == "System Overview":
         st.plotly_chart(fig, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
+    # RIGHT-SIDE METRICS (FIXED)
     with right:
         side_metrics = {
             "High-Risk Customers": transactions_fe.groupby("customer_id")["anomaly_score"].mean().gt(0.7).sum(),
@@ -240,7 +240,7 @@ if page == "System Overview":
             """
             st.markdown(card_html, unsafe_allow_html=True)
 
-    # High-risk customers table
+    # HIGHEST-RISK TABLE INSIDE GLASS CARD
     st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
 
     risk_df = (

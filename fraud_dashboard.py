@@ -49,6 +49,7 @@ body {
     font-family: 'Inter', sans-serif;
 }
 
+/* Pure-HTML glass cards (metric tiles) */
 .glass-card {
     background: rgba(255, 255, 255, 0.10);
     backdrop-filter: blur(40px) saturate(180%);
@@ -64,6 +65,44 @@ body {
 }
 
 .glass-card:hover {
+    transform: translateY(-6px);
+    box-shadow:
+        0 0 35px rgba(255, 0, 255, 0.45),
+        0 6px 40px rgba(0, 0, 0, 0.55);
+}
+
+/* Glass wrapper for Altair charts */
+[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed) {
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 20px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    overflow: hidden;
+}
+
+[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed):hover {
+    transform: translateY(-6px);
+    box-shadow:
+        0 0 35px rgba(255, 0, 255, 0.45),
+        0 6px 40px rgba(0, 0, 0, 0.55);
+}
+
+/* Glass wrapper for dataframes */
+[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.stDataFrame) {
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 20px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    overflow: hidden;
+}
+
+[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.stDataFrame):hover {
     transform: translateY(-6px);
     box-shadow:
         0 0 35px rgba(255, 0, 255, 0.45),
@@ -130,34 +169,30 @@ if page == "System Overview":
 
     st.markdown("<div class='section-header'>📊 Fraud Metrics</div>", unsafe_allow_html=True)
 
-    # Metric cards
-    with st.container():
-        st.markdown("<div class='equal-row'>", unsafe_allow_html=True)
-        col1, col2, col3, col4 = st.columns(4)
+    # Metric cards (pure HTML — glass-card div works fine here)
+    col1, col2, col3, col4 = st.columns(4)
 
-        metrics = [
-            ("Total Transactions", f"{len(transactions_fe):,}"),
-            ("Unique Customers", f"{transactions_fe['customer_id'].nunique():,}"),
-            ("Detected Anomalies", f"{transactions_fe['predicted_anomaly'].sum():,}"),
-            ("Avg Anomaly Score", f"{round(transactions_fe['anomaly_score'].mean(), 4)}")
-        ]
+    metrics = [
+        ("Total Transactions", f"{len(transactions_fe):,}"),
+        ("Unique Customers", f"{transactions_fe['customer_id'].nunique():,}"),
+        ("Detected Anomalies", f"{transactions_fe['predicted_anomaly'].sum():,}"),
+        ("Avg Anomaly Score", f"{round(transactions_fe['anomaly_score'].mean(), 4)}")
+    ]
 
-        for col, (title, value) in zip([col1, col2, col3, col4], metrics):
-            with col:
-                st.markdown(
-                    f"""
-                    <div class='glass-card'>
-                        <div class='metric-title'>{title}</div>
-                        <div class='metric-value'>{value}</div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-
-        st.markdown("</div>", unsafe_allow_html=True)
+    for col, (title, value) in zip([col1, col2, col3, col4], metrics):
+        with col:
+            st.markdown(
+                f"""
+                <div class='glass-card'>
+                    <div class='metric-title'>{title}</div>
+                    <div class='metric-value'>{value}</div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
     # ---------------------------------------------------------
-    # ⭐ ALTAR PIE CHART (INSIDE GLASS CARD)
+    # PIE CHART — wrapped in st.container() for CSS glass targeting
     # ---------------------------------------------------------
     pie_data = transactions_fe.copy()
     pie_data["bucket"] = pd.cut(
@@ -177,10 +212,12 @@ if page == "System Overview":
         .properties(height=400)
     )
 
-    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-    st.markdown("<div class='section-header'>📈 Anomaly Score Distribution</div>", unsafe_allow_html=True)
-    st.altair_chart(pie_chart, use_container_width=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # st.container() creates the stVerticalBlock the CSS :has(.vega-embed) selector targets
+    with st.container():
+        st.markdown("<div class='section-header'>📈 Anomaly Score Distribution</div>", unsafe_allow_html=True)
+        st.altair_chart(pie_chart, use_container_width=True)
 
     # ---------------------------------------------------------
     # SIDE METRICS
@@ -207,9 +244,9 @@ if page == "System Overview":
             )
 
     # ---------------------------------------------------------
-    # ⭐ ALTAR TABLE (INSIDE GLASS CARD)
+    # TABLE CHART — wrapped in st.container() for CSS glass targeting
     # ---------------------------------------------------------
-    st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
     risk_df = (
         transactions_fe.groupby("customer_id")["anomaly_score"]
@@ -230,9 +267,10 @@ if page == "System Overview":
         .properties(height=400)
     )
 
-    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-    st.altair_chart(table_chart, use_container_width=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    # st.container() creates the stVerticalBlock the CSS :has(.vega-embed) selector targets
+    with st.container():
+        st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
+        st.altair_chart(table_chart, use_container_width=True)
 
 # ---------------------------------------------------------
 # CUSTOMER SEARCH
@@ -249,13 +287,13 @@ elif page == "Customer Search":
             customer_id = int(customer_id)
             cust_df = transactions_fe[transactions_fe["customer_id"] == customer_id]
 
-            st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-            if cust_df.empty:
-                st.warning("Customer not found.")
-            else:
-                st.success(f"Found {len(cust_df)} transactions.")
-                st.dataframe(cust_df.head(20), use_container_width=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+            # st.container() creates the stVerticalBlock the CSS :has(.stDataFrame) selector targets
+            with st.container():
+                if cust_df.empty:
+                    st.warning("Customer not found.")
+                else:
+                    st.success(f"Found {len(cust_df)} transactions.")
+                    st.dataframe(cust_df.head(20), use_container_width=True)
 
         except:
             st.error("Please enter a valid numeric ID.")
@@ -293,10 +331,10 @@ elif page == "Customer Details":
                     unsafe_allow_html=True
                 )
 
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.write("### Recent Transactions")
-        st.dataframe(cust_df.tail(20), use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        # st.container() creates the stVerticalBlock the CSS :has(.stDataFrame) selector targets
+        with st.container():
+            st.write("### Recent Transactions")
+            st.dataframe(cust_df.tail(20), use_container_width=True)
 
     else:
         st.info("Enter a valid customer ID.")
@@ -314,6 +352,6 @@ elif page == "Risk Ranking":
         .reset_index()
     )
 
-    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-    st.dataframe(risk_df.head(20), use_container_width=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    # st.container() creates the stVerticalBlock the CSS :has(.stDataFrame) selector targets
+    with st.container():
+        st.dataframe(risk_df.head(20), use_container_width=True)

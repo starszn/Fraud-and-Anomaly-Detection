@@ -39,15 +39,20 @@ st.markdown("""
 }
 
 body {
-    background: radial-gradient(circle at top left,
-        #050510 0%,
-        #09071a 35%,
-        #120a2a 65%,
-        #1e0f3f 100%);
+    background: linear-gradient(
+        135deg,
+        #0a021a 0%,
+        #1a0533 20%,
+        #2b0a55 40%,
+        #3d0f77 60%,
+        #4f14a0 80%,
+        #5f1ac7 100%
+    );
     background-attachment: fixed;
     color: #EDE6FF;
     font-family: 'Inter', sans-serif;
 }
+
 
 /* Pure-HTML glass cards (metric tiles) */
 .glass-card {

@@ -26,103 +26,172 @@ transactions_fe = load_data()
 iso = joblib.load(os.path.join(BASE_DIR, "isolation_forest_model.pkl"))
 
 # ---------------------------------------------------------
-# CSS (Liquid Glass — iOS 26 / reference style)
+# CSS
 # ---------------------------------------------------------
 st.markdown("""
 <style>
 
-/* ── Background ── */
+/* ── Base background — periwinkle/lavender like the reference ── */
 .stApp {
     background: linear-gradient(
         135deg,
-        #0a021a 0%,
-        #1a0533 20%,
-        #2b0a55 40%,
-        #3d0f77 60%,
-        #4f14a0 80%,
-        #5f1ac7 100%
+        #6a7fd4 0%,
+        #8b6fc8 30%,
+        #b97acd 60%,
+        #d48aaa 100%
     );
     background-attachment: fixed;
-    color: #EDE6FF;
+    min-height: 100vh;
+    color: #1a103a;
     font-family: 'Inter', sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+/* ── Orb layer — sits behind everything ── */
+.stApp::before,
+.stApp::after {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(90px);
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Top-center cyan/white orb */
+.stApp::before {
+    width: 600px;
+    height: 600px;
+    top: -180px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: radial-gradient(circle,
+        rgba(190, 230, 255, 0.90) 0%,
+        rgba(140, 190, 255, 0.60) 40%,
+        rgba(100, 140, 230, 0.00) 70%
+    );
+}
+
+/* Bottom-right coral/pink orb */
+.stApp::after {
+    width: 700px;
+    height: 700px;
+    bottom: -200px;
+    right: -150px;
+    background: radial-gradient(circle,
+        rgba(255, 160, 140, 0.85) 0%,
+        rgba(255, 120, 160, 0.55) 40%,
+        rgba(200, 100, 180, 0.00) 70%
+    );
+}
+
+/* Extra orbs via a wrapper div we inject below */
+.orb-white-left {
+    position: fixed;
+    width: 500px;
+    height: 500px;
+    bottom: -100px;
+    left: -120px;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+        rgba(220, 230, 255, 0.80) 0%,
+        rgba(180, 200, 255, 0.45) 45%,
+        rgba(150, 170, 240, 0.00) 70%
+    );
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Ensure Streamlit content sits above orbs */
+.stApp > * {
+    position: relative;
+    z-index: 1;
 }
 
 /* ── Shared liquid-glass mixin ── */
 .glass-card,
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed),
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.stDataFrame) {
-    /* Near-invisible fill so the gradient bleeds through */
-    background: rgba(255, 255, 255, 0.06);
-
-    /* Heavy blur + saturation boost = frosted-glass depth */
-    backdrop-filter: blur(60px) saturate(220%) brightness(1.08);
-    -webkit-backdrop-filter: blur(60px) saturate(220%) brightness(1.08);
-
-    /* Soft bright border — thicker top/left for light-source illusion */
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(50px) saturate(200%) brightness(1.10);
+    -webkit-backdrop-filter: blur(50px) saturate(200%) brightness(1.10);
     border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.30);
+    border: 1px solid rgba(255, 255, 255, 0.55);
     box-shadow:
-        /* inner top-left highlight */
-        inset 0 1px 0 rgba(255, 255, 255, 0.45),
-        inset 1px 0 0 rgba(255, 255, 255, 0.20),
-        /* outer ambient glow */
-        0 8px 32px rgba(0, 0, 0, 0.35),
-        0 2px 8px  rgba(0, 0, 0, 0.20);
-
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.70),
+        inset 1px 0 0   rgba(255, 255, 255, 0.35),
+        0 8px 32px rgba(100, 80, 180, 0.20),
+        0 2px 8px  rgba(0,   0,   0,   0.10);
     padding: 22px;
     width: 100%;
     transition: transform 0.28s ease, box-shadow 0.28s ease;
     overflow: hidden;
 }
 
-/* ── Hover lift ── */
 .glass-card:hover,
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed):hover,
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.stDataFrame):hover {
     transform: translateY(-8px);
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.55),
-        inset 1px 0 0 rgba(255, 255, 255, 0.25),
-        0 0 55px rgba(180, 80, 255, 0.50),
-        0 16px 60px rgba(0, 0, 0, 0.55);
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.80),
+        inset 1px 0 0   rgba(255, 255, 255, 0.40),
+        0 0 50px rgba(180, 120, 255, 0.35),
+        0 16px 60px rgba(0, 0, 0, 0.18);
 }
 
-/* ── metric card flex layout ── */
 .glass-card {
     display: flex;
     flex-direction: column;
 }
 
+/* ── Typography ── */
 .section-header {
-    font-size: 24px;
-    font-weight: 600;
-    color: #F5E8FF;
-    margin-bottom: 10px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #2a1060;
+    margin-bottom: 12px;
+    text-shadow: 0 1px 2px rgba(255,255,255,0.4);
 }
 
 .metric-title {
-    font-size: 13px;
-    color: rgba(220, 200, 255, 0.80);
+    font-size: 11px;
+    color: rgba(60, 30, 120, 0.75);
     margin-bottom: 6px;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
+    font-weight: 600;
 }
 
 .metric-value {
     font-size: 30px;
-    font-weight: 700;
-    color: #FF4FFB;
-    text-shadow: 0 0 20px rgba(255, 79, 251, 0.45);
+    font-weight: 800;
+    color: #3d0f9e;
+    text-shadow: 0 2px 12px rgba(100, 50, 200, 0.25);
+}
+
+/* ── Streamlit widget text overrides for light bg ── */
+h1 {
+    color: #1a103a !important;
+    text-shadow: 0 2px 8px rgba(255,255,255,0.3);
+}
+
+label, .stSelectbox label, .stTextInput label, .stNumberInput label {
+    color: #2a1060 !important;
 }
 
 </style>
+
+<!-- Bottom-left white orb (can't do 3+ pseudo-elements, so inject as HTML) -->
+<div class="orb-white-left"></div>
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # SIDEBAR
 # ---------------------------------------------------------
 st.sidebar.markdown(
-    "<h2 style='color:#E0D8FF;'>📊 Dashboard</h2>",
+    "<h2 style='color:#2a1060;'>📊 Dashboard</h2>",
     unsafe_allow_html=True
 )
 
@@ -135,7 +204,7 @@ page = st.sidebar.radio(
 # HEADER
 # ---------------------------------------------------------
 st.markdown(
-    "<h1 style='text-align:center; color:#F5E8FF;'>🔍 Fraud Detection Dashboard</h1>",
+    "<h1 style='text-align:center; color:#1a103a;'>🔍 Fraud Detection Dashboard</h1>",
     unsafe_allow_html=True
 )
 

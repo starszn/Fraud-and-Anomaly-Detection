@@ -25,7 +25,7 @@ transactions_fe = load_data()
 iso = joblib.load(os.path.join(BASE_DIR, "isolation_forest_model.pkl"))
 
 # ---------------------------------------------------------
-# ULTRA GLASS SHADCN CSS + CENTERED LAYOUT + FLOATING ANIMATION
+# ULTRA GLASS SHADCN CSS + CENTERED LAYOUT + HOVER LIFT
 # ---------------------------------------------------------
 st.markdown("""
 <style>
@@ -68,13 +68,6 @@ body {
     letter-spacing: -0.01em;
 }
 
-/* FLOATING ANIMATION */
-@keyframes floaty {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-6px); }
-    100% { transform: translateY(0px); }
-}
-
 /* ULTRA GLASS — SHADCN STYLE */
 .glass-card {
     background: rgba(255, 255, 255, 0.10);
@@ -89,7 +82,15 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
-    animation: floaty 6s ease-in-out infinite;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* HOVER LIFT EFFECT */
+.glass-card:hover {
+    transform: translateY(-6px);
+    box-shadow:
+        0 0 35px rgba(255, 0, 255, 0.45),
+        0 6px 40px rgba(0, 0, 0, 0.55);
 }
 
 /* Equal-height flexbox row */
@@ -223,7 +224,7 @@ if page == "System Overview":
         st.plotly_chart(fig, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # RIGHT-SIDE METRICS (FIXED)
+    # RIGHT-SIDE METRICS
     with right:
         side_metrics = {
             "High-Risk Customers": transactions_fe.groupby("customer_id")["anomaly_score"].mean().gt(0.7).sum(),

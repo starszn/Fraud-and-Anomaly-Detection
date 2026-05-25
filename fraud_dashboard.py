@@ -26,17 +26,10 @@ transactions_fe = load_data()
 iso = joblib.load(os.path.join(BASE_DIR, "isolation_forest_model.pkl"))
 
 # ---------------------------------------------------------
-# CSS (Glass + Hover Lift)
+# CSS (Ultra Glass + Gradient Background)
 # ---------------------------------------------------------
 st.markdown("""
 <style>
-
-.main .block-container {
-    max-width: 1320px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0 !important;
-}
 
 .stApp {
     background: linear-gradient(
@@ -53,15 +46,14 @@ st.markdown("""
     font-family: 'Inter', sans-serif;
 }
 
-
-/* Pure-HTML glass cards (metric tiles) */
+/* ULTRA GLASS — Metric Cards */
 .glass-card {
-    background: rgba(255, 255, 255, 0.10);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(80px) saturate(300%);
+    -webkit-backdrop-filter: blur(80px) saturate(300%);
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    padding: 22px;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -70,48 +62,48 @@ st.markdown("""
 }
 
 .glass-card:hover {
-    transform: translateY(-6px);
+    transform: translateY(-8px);
     box-shadow:
-        0 0 35px rgba(255, 0, 255, 0.45),
-        0 6px 40px rgba(0, 0, 0, 0.55);
+        0 0 55px rgba(255, 0, 255, 0.55),
+        0 12px 60px rgba(0, 0, 0, 0.65);
 }
 
-/* Glass wrapper for Altair charts */
+/* ULTRA GLASS — Altair Chart Containers */
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed) {
-    background: rgba(255, 255, 255, 0.10);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(80px) saturate(300%);
+    -webkit-backdrop-filter: blur(80px) saturate(300%);
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    padding: 22px;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
     overflow: hidden;
 }
 
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed):hover {
-    transform: translateY(-6px);
+    transform: translateY(-8px);
     box-shadow:
-        0 0 35px rgba(255, 0, 255, 0.45),
-        0 6px 40px rgba(0, 0, 0, 0.55);
+        0 0 55px rgba(255, 0, 255, 0.55),
+        0 12px 60px rgba(0, 0, 0, 0.65);
 }
 
-/* Glass wrapper for dataframes */
+/* ULTRA GLASS — DataFrame Containers */
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.stDataFrame) {
-    background: rgba(255, 255, 255, 0.10);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(80px) saturate(300%);
+    -webkit-backdrop-filter: blur(80px) saturate(300%);
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    padding: 22px;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
     overflow: hidden;
 }
 
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.stDataFrame):hover {
-    transform: translateY(-6px);
+    transform: translateY(-8px);
     box-shadow:
-        0 0 35px rgba(255, 0, 255, 0.45),
-        0 6px 40px rgba(0, 0, 0, 0.55);
+        0 0 55px rgba(255, 0, 255, 0.55),
+        0 12px 60px rgba(0, 0, 0, 0.65);
 }
 
 .equal-row {
@@ -174,7 +166,6 @@ if page == "System Overview":
 
     st.markdown("<div class='section-header'>📊 Fraud Metrics</div>", unsafe_allow_html=True)
 
-    # Metric cards (pure HTML — glass-card div works fine here)
     col1, col2, col3, col4 = st.columns(4)
 
     metrics = [
@@ -196,9 +187,7 @@ if page == "System Overview":
                 unsafe_allow_html=True
             )
 
-    # ---------------------------------------------------------
-    # PIE CHART — st.container() lets CSS :has(.vega-embed) target it
-    # ---------------------------------------------------------
+    # PIE CHART
     pie_data = transactions_fe.copy()
     pie_data["bucket"] = pd.cut(
         pie_data["anomaly_score"],
@@ -221,9 +210,7 @@ if page == "System Overview":
         st.markdown("<div class='section-header'>📈 Anomaly Score Distribution</div>", unsafe_allow_html=True)
         st.altair_chart(pie_chart, use_container_width=True)
 
-    # ---------------------------------------------------------
     # SIDE METRICS
-    # ---------------------------------------------------------
     st.markdown("<br>", unsafe_allow_html=True)
     colA, colB, colC = st.columns(3)
 
@@ -245,9 +232,7 @@ if page == "System Overview":
                 unsafe_allow_html=True
             )
 
-    # ---------------------------------------------------------
-    # DATAFRAME — st.container() lets CSS :has(.stDataFrame) target it
-    # ---------------------------------------------------------
+    # DATAFRAME
     st.markdown("<br>", unsafe_allow_html=True)
 
     risk_df = (
@@ -276,7 +261,6 @@ elif page == "Customer Search":
             customer_id = int(customer_id)
             cust_df = transactions_fe[transactions_fe["customer_id"] == customer_id]
 
-            # st.container() lets CSS :has(.stDataFrame) target it
             with st.container():
                 if cust_df.empty:
                     st.warning("Customer not found.")
@@ -320,7 +304,6 @@ elif page == "Customer Details":
                     unsafe_allow_html=True
                 )
 
-        # st.container() lets CSS :has(.stDataFrame) target it
         with st.container():
             st.write("### Recent Transactions")
             st.dataframe(cust_df.tail(20), use_container_width=True)
@@ -341,6 +324,5 @@ elif page == "Risk Ranking":
         .reset_index()
     )
 
-    # st.container() lets CSS :has(.stDataFrame) target it
     with st.container():
         st.dataframe(risk_df.head(20), use_container_width=True)

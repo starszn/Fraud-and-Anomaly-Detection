@@ -114,11 +114,11 @@ st.markdown("""
 .glass-card,
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed),
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.stDataFrame) {
-    background: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
     backdrop-filter: blur(50px) saturate(200%) brightness(1.10);
     -webkit-backdrop-filter: blur(50px) saturate(200%) brightness(1.10);
     border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow:
         inset 0 1.5px 0 rgba(255, 255, 255, 0.70),
         inset 1px 0 0   rgba(255, 255, 255, 0.35),

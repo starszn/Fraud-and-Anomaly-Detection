@@ -45,105 +45,213 @@ def glass_table(df: pd.DataFrame):
     st.markdown(html, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# CSS  — plain triple-quoted string, NOT an f-string
-#         so single curly braces are fine
+# CSS
 # ---------------------------------------------------------
 st.markdown("""
 <style>
 
-/* ── Base background ── */
+/* ── Holographic pastel base ── */
 .stApp {
     background: linear-gradient(
         135deg,
-        #6a7fd4 0%,
-        #8b6fc8 30%,
-        #b97acd 60%,
-        #d48aaa 100%
+        #dce8ff 0%,
+        #e8d6f8 25%,
+        #f5d6ee 50%,
+        #d6e4f8 75%,
+        #ccd8ff 100%
     );
     background-attachment: fixed;
     min-height: 100vh;
-    color: #1a103a;
+    color: #2a1060;
     font-family: 'Inter', sans-serif;
     position: relative;
     overflow: hidden;
 }
 
-/* ── Orbs ── */
-.stApp::before,
-.stApp::after {
-    content: '';
+/* ── Blob base styles ── */
+.blob {
     position: fixed;
     border-radius: 50%;
-    filter: blur(90px);
-    z-index: 0;
     pointer-events: none;
+    z-index: 0;
 }
 
-/* Top-center cyan/white orb */
-.stApp::before {
-    width: 600px;
-    height: 600px;
-    top: -180px;
+/* Large glowing white center orb */
+.blob-center {
+    width: 520px;
+    height: 520px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    background: radial-gradient(circle,
-        rgba(190, 230, 255, 0.90) 0%,
-        rgba(140, 190, 255, 0.60) 40%,
-        rgba(100, 140, 230, 0.00) 70%
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle at 38% 35%,
+        rgba(255, 255, 255, 1.00) 0%,
+        rgba(255, 220, 240, 0.80) 30%,
+        rgba(220, 200, 255, 0.50) 60%,
+        rgba(180, 180, 255, 0.00) 80%
     );
+    filter: blur(18px);
 }
 
-/* Bottom-right coral/pink orb */
-.stApp::after {
-    width: 700px;
-    height: 700px;
-    bottom: -200px;
-    right: -150px;
-    background: radial-gradient(circle,
-        rgba(255, 160, 140, 0.85) 0%,
-        rgba(255, 120, 160, 0.55) 40%,
-        rgba(200, 100, 180, 0.00) 70%
+/* Top-left lavender blob — pill shaped */
+.blob-tl {
+    width: 420px;
+    height: 300px;
+    top: -60px;
+    left: -80px;
+    border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%;
+    background: radial-gradient(circle at 40% 35%,
+        rgba(210, 200, 255, 0.95) 0%,
+        rgba(180, 170, 245, 0.75) 45%,
+        rgba(150, 140, 230, 0.00) 75%
     );
+    filter: blur(8px);
 }
 
-/* Bottom-left white orb (injected as HTML div below) */
-.orb-white-left {
-    position: fixed;
+/* Top-right squiggle blob */
+.blob-tr {
+    width: 380px;
+    height: 220px;
+    top: -30px;
+    right: -60px;
+    border-radius: 70% 30% 50% 50% / 40% 60% 40% 60%;
+    background: radial-gradient(circle at 35% 40%,
+        rgba(200, 215, 255, 0.95) 0%,
+        rgba(170, 190, 245, 0.70) 45%,
+        rgba(140, 165, 230, 0.00) 75%
+    );
+    filter: blur(10px);
+}
+
+/* Left pink sphere */
+.blob-left-pink {
+    width: 170px;
+    height: 170px;
+    top: 28%;
+    left: 3%;
+    background: radial-gradient(circle at 35% 30%,
+        rgba(255, 200, 230, 1.00) 0%,
+        rgba(255, 140, 200, 0.90) 40%,
+        rgba(220, 100, 180, 0.40) 70%,
+        rgba(180,  80, 160, 0.00) 90%
+    );
+    filter: blur(2px);
+    box-shadow: inset -6px -6px 14px rgba(180, 80, 160, 0.25);
+}
+
+/* Center-left hot-pink sphere */
+.blob-mid-pink {
+    width: 240px;
+    height: 240px;
+    top: 20%;
+    left: 18%;
+    background: radial-gradient(circle at 35% 28%,
+        rgba(255, 210, 235, 1.00) 0%,
+        rgba(255, 150, 210, 0.90) 38%,
+        rgba(230, 100, 190, 0.45) 65%,
+        rgba(190,  70, 170, 0.00) 85%
+    );
+    filter: blur(3px);
+    box-shadow: inset -8px -8px 18px rgba(190, 70, 170, 0.30);
+}
+
+/* Right-side periwinkle sphere */
+.blob-right-blue {
+    width: 200px;
+    height: 200px;
+    top: 25%;
+    right: 6%;
+    background: radial-gradient(circle at 35% 30%,
+        rgba(220, 230, 255, 1.00) 0%,
+        rgba(170, 195, 255, 0.90) 40%,
+        rgba(130, 160, 240, 0.40) 68%,
+        rgba(100, 130, 220, 0.00) 88%
+    );
+    filter: blur(2px);
+    box-shadow: inset -7px -7px 16px rgba(100, 130, 220, 0.28);
+}
+
+/* Bottom-left large lavender blob */
+.blob-bl {
     width: 500px;
-    height: 500px;
-    bottom: -100px;
-    left: -120px;
-    border-radius: 50%;
-    background: radial-gradient(circle,
-        rgba(220, 230, 255, 0.80) 0%,
-        rgba(180, 200, 255, 0.45) 45%,
-        rgba(150, 170, 240, 0.00) 70%
+    height: 350px;
+    bottom: -80px;
+    left: -100px;
+    border-radius: 50% 50% 40% 60% / 60% 40% 60% 40%;
+    background: radial-gradient(circle at 40% 35%,
+        rgba(200, 215, 255, 0.95) 0%,
+        rgba(170, 190, 248, 0.75) 45%,
+        rgba(140, 165, 235, 0.00) 75%
     );
-    filter: blur(80px);
+    filter: blur(12px);
+}
+
+/* Bottom-center medium sphere */
+.blob-bc {
+    width: 280px;
+    height: 280px;
+    bottom: 2%;
+    left: 42%;
+    background: radial-gradient(circle at 35% 28%,
+        rgba(215, 225, 255, 1.00) 0%,
+        rgba(175, 195, 255, 0.90) 40%,
+        rgba(140, 165, 245, 0.40) 68%,
+        rgba(110, 135, 225, 0.00) 88%
+    );
+    filter: blur(3px);
+    box-shadow: inset -9px -9px 20px rgba(110, 135, 225, 0.30);
+}
+
+/* Bottom-right large blob */
+.blob-br {
+    width: 440px;
+    height: 320px;
+    bottom: -60px;
+    right: -80px;
+    border-radius: 40% 60% 50% 50% / 50% 40% 60% 50%;
+    background: radial-gradient(circle at 38% 32%,
+        rgba(210, 205, 255, 0.95) 0%,
+        rgba(180, 175, 248, 0.70) 45%,
+        rgba(150, 145, 235, 0.00) 75%
+    );
+    filter: blur(12px);
+}
+
+/* Sparkle / lens flare on the center orb */
+.blob-sparkle {
+    position: fixed;
+    width: 80px;
+    height: 80px;
+    top: calc(50% + 60px);
+    left: calc(50% - 10px);
+    background: radial-gradient(circle,
+        rgba(255, 255, 255, 1.00) 0%,
+        rgba(255, 230, 250, 0.60) 30%,
+        rgba(255, 200, 240, 0.00) 70%
+    );
+    filter: blur(2px);
     pointer-events: none;
     z-index: 0;
 }
 
-/* Keep Streamlit content above orbs */
+/* Keep Streamlit content above blobs */
 .stApp > * {
     position: relative;
     z-index: 1;
 }
 
-/* ── Shared liquid-glass card ──
-     Covers: pure-HTML metric tiles, Altair chart containers */
+/* ── Shared liquid-glass card ── */
 .glass-card,
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed) {
-    background: rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(50px) saturate(200%) brightness(1.10);
-    -webkit-backdrop-filter: blur(50px) saturate(200%) brightness(1.10);
+    background: rgba(255, 255, 255, 0.20);
+    backdrop-filter: blur(50px) saturate(180%) brightness(1.08);
+    -webkit-backdrop-filter: blur(50px) saturate(180%) brightness(1.08);
     border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.55);
     box-shadow:
-        inset 0 1.5px 0 rgba(255, 255, 255, 0.50),
-        inset 1px 0 0   rgba(255, 255, 255, 0.20),
-        0 8px 32px rgba(100, 80, 180, 0.15),
-        0 2px 8px  rgba(0, 0, 0, 0.08);
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.80),
+        inset 1px 0 0   rgba(255, 255, 255, 0.40),
+        0 8px 32px rgba(140, 100, 200, 0.12),
+        0 2px 8px  rgba(0,   0,   0,   0.06);
     padding: 22px;
     width: 100%;
     transition: transform 0.28s ease, box-shadow 0.28s ease;
@@ -154,10 +262,10 @@ st.markdown("""
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed):hover {
     transform: translateY(-8px);
     box-shadow:
-        inset 0 1.5px 0 rgba(255, 255, 255, 0.80),
-        inset 1px 0 0   rgba(255, 255, 255, 0.40),
-        0 0 50px rgba(180, 120, 255, 0.35),
-        0 16px 60px rgba(0, 0, 0, 0.18);
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.90),
+        inset 1px 0 0   rgba(255, 255, 255, 0.50),
+        0 0 50px rgba(200, 150, 255, 0.30),
+        0 16px 50px rgba(0, 0, 0, 0.10);
 }
 
 .glass-card {
@@ -165,14 +273,14 @@ st.markdown("""
     flex-direction: column;
 }
 
-/* ── Kill Altair's white canvas ── */
+/* ── Kill Altair white canvas ── */
 .vega-embed,
 .vega-embed canvas,
 .vega-embed svg {
     background: transparent !important;
 }
 
-/* ── Glass HTML table (replaces st.dataframe) ── */
+/* ── Glass HTML table ── */
 .glass-table {
     width: 100%;
     border-collapse: collapse;
@@ -180,7 +288,7 @@ st.markdown("""
 }
 
 .glass-table thead tr {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.30);
+    border-bottom: 1px solid rgba(150, 120, 200, 0.25);
 }
 
 .glass-table th {
@@ -190,17 +298,17 @@ st.markdown("""
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(42, 16, 96, 0.70);
+    color: rgba(60, 30, 120, 0.60);
 }
 
 .glass-table td {
     padding: 11px 16px;
-    color: #1a103a;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    color: #2a1060;
+    border-bottom: 1px solid rgba(180, 160, 220, 0.15);
 }
 
 .glass-table tbody tr:hover td {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.25);
 }
 
 .glass-table tbody tr:last-child td {
@@ -211,14 +319,14 @@ st.markdown("""
 .section-header {
     font-size: 22px;
     font-weight: 700;
-    color: #2a1060;
+    color: #3a1880;
     margin-bottom: 12px;
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.4);
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.60);
 }
 
 .metric-title {
     font-size: 11px;
-    color: rgba(60, 30, 120, 0.75);
+    color: rgba(80, 40, 160, 0.70);
     margin-bottom: 6px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -228,32 +336,42 @@ st.markdown("""
 .metric-value {
     font-size: 30px;
     font-weight: 800;
-    color: #3d0f9e;
-    text-shadow: 0 2px 12px rgba(100, 50, 200, 0.25);
+    color: #5a12c0;
+    text-shadow: 0 2px 10px rgba(140, 80, 220, 0.20);
 }
 
 h1 {
-    color: #1a103a !important;
-    text-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
+    color: #3a1880 !important;
+    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.50) !important;
 }
 
 label,
 .stSelectbox label,
 .stTextInput label,
 .stNumberInput label {
-    color: #2a1060 !important;
+    color: #3a1880 !important;
 }
 
 </style>
 
-<div class="orb-white-left"></div>
+<!-- Blob elements injected as HTML since CSS only gives us 2 pseudo-elements -->
+<div class="blob blob-center"></div>
+<div class="blob blob-tl"></div>
+<div class="blob blob-tr"></div>
+<div class="blob blob-left-pink"></div>
+<div class="blob blob-mid-pink"></div>
+<div class="blob blob-right-blue"></div>
+<div class="blob blob-bl"></div>
+<div class="blob blob-bc"></div>
+<div class="blob blob-br"></div>
+<div class="blob-sparkle"></div>
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # SIDEBAR
 # ---------------------------------------------------------
 st.sidebar.markdown(
-    "<h2 style='color:#2a1060;'>📊 Dashboard</h2>",
+    "<h2 style='color:#3a1880;'>📊 Dashboard</h2>",
     unsafe_allow_html=True
 )
 
@@ -266,7 +384,7 @@ page = st.sidebar.radio(
 # HEADER
 # ---------------------------------------------------------
 st.markdown(
-    "<h1 style='text-align:center; color:#1a103a;'>🔍 Fraud Detection Dashboard</h1>",
+    "<h1 style='text-align:center;'>🔍 Fraud Detection Dashboard</h1>",
     unsafe_allow_html=True
 )
 
@@ -298,7 +416,7 @@ if page == "System Overview":
                 unsafe_allow_html=True
             )
 
-    # PIE CHART — transparent background via Altair config
+    # PIE CHART
     pie_data = transactions_fe.copy()
     pie_data["bucket"] = pd.cut(
         pie_data["anomaly_score"],
@@ -347,7 +465,7 @@ if page == "System Overview":
                 unsafe_allow_html=True
             )
 
-    # TABLE — glass HTML table, no st.dataframe iframe
+    # TABLE
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
 

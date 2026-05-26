@@ -66,6 +66,7 @@ st.markdown("""
         #d8e6ff 88%,
         #ccd8ff 100%
     );
+    /* Fixed so it never scrolls with content */
     background-attachment: fixed;
     min-height: 100vh;
     color: #2a1060;
@@ -76,7 +77,7 @@ st.markdown("""
     -webkit-transform: translateZ(0);
 }
 
-/* ── All blobs sit behind page content ── */
+/* ── All blobs: fixed so they stay put while scrolling ── */
 .blob {
     position: fixed;
     pointer-events: none;
@@ -85,43 +86,9 @@ st.markdown("""
 }
 
 /* ────────────────────────────────────────
-   LARGE BLOBS (organic shapes)
-   — no filter:blur, edges fade via gradient stops
+   BOTTOM CORNER BLOBS ONLY
+   (top-left and top-right removed per request)
    ──────────────────────────────────────── */
-
-/* Top-left lavender pill */
-.blob-tl {
-    width: 500px;
-    height: 360px;
-    top: -80px;
-    left: -90px;
-    border-radius: 62% 38% 72% 28% / 52% 62% 38% 48%;
-    background: radial-gradient(ellipse at 42% 38%,
-        rgba(195, 188, 255, 1.00)  0%,
-        rgba(175, 168, 252, 0.96) 18%,
-        rgba(158, 150, 245, 0.85) 35%,
-        rgba(140, 132, 235, 0.60) 55%,
-        rgba(120, 112, 222, 0.25) 75%,
-        rgba(100,  92, 210, 0.00) 90%
-    );
-}
-
-/* Top-right periwinkle pill */
-.blob-tr {
-    width: 440px;
-    height: 260px;
-    top: -40px;
-    right: -70px;
-    border-radius: 72% 28% 52% 48% / 42% 58% 42% 58%;
-    background: radial-gradient(ellipse at 38% 42%,
-        rgba(188, 212, 255, 1.00)  0%,
-        rgba(165, 194, 255, 0.96) 18%,
-        rgba(145, 175, 252, 0.84) 35%,
-        rgba(122, 155, 242, 0.58) 55%,
-        rgba(100, 132, 228, 0.22) 75%,
-        rgba( 80, 112, 215, 0.00) 90%
-    );
-}
 
 /* Bottom-left large lavender blob */
 .blob-bl {
@@ -159,8 +126,6 @@ st.markdown("""
 
 /* ────────────────────────────────────────
    3-D SPHERES
-   — highlight at top-left, shadow at bottom-right
-   — many stops = smooth shading, no blur needed
    ──────────────────────────────────────── */
 
 /* Large white glowing center orb */
@@ -192,13 +157,13 @@ st.markdown("""
     border-radius: 50%;
     background: radial-gradient(ellipse at 33% 28%,
         rgba(255, 225, 240, 1.00)  0%,
-        rgba(255, 190, 225, 0.97)  14%,
-        rgba(255, 155, 210, 0.90)  28%,
-        rgba(248, 120, 195, 0.78)  42%,
-        rgba(235,  88, 180, 0.58)  57%,
-        rgba(218,  62, 165, 0.32)  72%,
-        rgba(198,  42, 150, 0.10)  85%,
-        rgba(178,  28, 138, 0.00)  95%
+        rgba(255, 190, 225, 0.97) 14%,
+        rgba(255, 155, 210, 0.90) 28%,
+        rgba(248, 120, 195, 0.78) 42%,
+        rgba(235,  88, 180, 0.58) 57%,
+        rgba(218,  62, 165, 0.32) 72%,
+        rgba(198,  42, 150, 0.10) 85%,
+        rgba(178,  28, 138, 0.00) 95%
     );
 }
 
@@ -211,13 +176,13 @@ st.markdown("""
     border-radius: 50%;
     background: radial-gradient(ellipse at 32% 27%,
         rgba(255, 235, 248, 1.00)  0%,
-        rgba(255, 205, 238, 0.97)  12%,
-        rgba(255, 168, 222, 0.90)  26%,
-        rgba(252, 132, 208, 0.78)  40%,
-        rgba(240,  98, 192, 0.58)  56%,
-        rgba(222,  68, 178, 0.32)  72%,
-        rgba(202,  45, 162, 0.10)  85%,
-        rgba(180,  28, 148, 0.00)  95%
+        rgba(255, 205, 238, 0.97) 12%,
+        rgba(255, 168, 222, 0.90) 26%,
+        rgba(252, 132, 208, 0.78) 40%,
+        rgba(240,  98, 192, 0.58) 56%,
+        rgba(222,  68, 178, 0.32) 72%,
+        rgba(202,  45, 162, 0.10) 85%,
+        rgba(180,  28, 148, 0.00) 95%
     );
 }
 
@@ -230,13 +195,13 @@ st.markdown("""
     border-radius: 50%;
     background: radial-gradient(ellipse at 34% 28%,
         rgba(235, 242, 255, 1.00)  0%,
-        rgba(208, 225, 255, 0.97)  14%,
-        rgba(178, 205, 255, 0.90)  28%,
-        rgba(148, 182, 252, 0.78)  42%,
-        rgba(118, 158, 242, 0.55)  57%,
-        rgba( 90, 135, 228, 0.28)  72%,
-        rgba( 65, 112, 215, 0.08)  85%,
-        rgba( 45,  92, 200, 0.00)  95%
+        rgba(208, 225, 255, 0.97) 14%,
+        rgba(178, 205, 255, 0.90) 28%,
+        rgba(148, 182, 252, 0.78) 42%,
+        rgba(118, 158, 242, 0.55) 57%,
+        rgba( 90, 135, 228, 0.28) 72%,
+        rgba( 65, 112, 215, 0.08) 85%,
+        rgba( 45,  92, 200, 0.00) 95%
     );
 }
 
@@ -249,17 +214,17 @@ st.markdown("""
     border-radius: 50%;
     background: radial-gradient(ellipse at 34% 28%,
         rgba(228, 238, 255, 1.00)  0%,
-        rgba(200, 220, 255, 0.97)  14%,
-        rgba(170, 200, 255, 0.90)  28%,
-        rgba(140, 178, 252, 0.78)  42%,
-        rgba(110, 154, 240, 0.55)  57%,
-        rgba( 82, 130, 226, 0.28)  72%,
-        rgba( 58, 108, 212, 0.08)  85%,
-        rgba( 38,  88, 198, 0.00)  95%
+        rgba(200, 220, 255, 0.97) 14%,
+        rgba(170, 200, 255, 0.90) 28%,
+        rgba(140, 178, 252, 0.78) 42%,
+        rgba(110, 154, 240, 0.55) 57%,
+        rgba( 82, 130, 226, 0.28) 72%,
+        rgba( 58, 108, 212, 0.08) 85%,
+        rgba( 38,  88, 198, 0.00) 95%
     );
 }
 
-/* ── Lens-flare sparkle (pure gradient, no blur) ── */
+/* ── Lens-flare sparkle ── */
 .blob-sparkle {
     position: fixed;
     width: 130px;
@@ -280,25 +245,25 @@ st.markdown("""
         );
 }
 
-/* Keep page content above blobs */
+/* ── Keep page content above blobs ── */
 .stApp > * {
     position: relative;
     z-index: 1;
 }
 
-/* ── Shared liquid-glass card ── */
+/* ── Shared liquid-glass card — more transparent ── */
 .glass-card,
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed) {
-    background: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.08);       /* ↓ was 0.22 */
     backdrop-filter: blur(40px) saturate(160%) brightness(1.06);
     -webkit-backdrop-filter: blur(40px) saturate(160%) brightness(1.06);
     border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.60);
+    border: 1px solid rgba(255, 255, 255, 0.35); /* ↓ was 0.60 */
     box-shadow:
-        inset 0 1.5px 0 rgba(255, 255, 255, 0.85),
-        inset 1px 0 0   rgba(255, 255, 255, 0.45),
-        0 8px 32px rgba(140, 100, 200, 0.10),
-        0 2px 8px  rgba(0,   0,   0,   0.05);
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.60),
+        inset 1px 0 0   rgba(255, 255, 255, 0.30),
+        0 8px 32px rgba(140, 100, 200, 0.08),
+        0 2px 8px  rgba(0,   0,   0,   0.04);
     padding: 22px;
     width: 100%;
     transition: transform 0.28s ease, box-shadow 0.28s ease;
@@ -310,10 +275,10 @@ st.markdown("""
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed):hover {
     transform: translateY(-8px) translateZ(0);
     box-shadow:
-        inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
-        inset 1px 0 0   rgba(255, 255, 255, 0.55),
-        0 0 55px rgba(200, 150, 255, 0.28),
-        0 18px 55px rgba(0, 0, 0, 0.09);
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.75),
+        inset 1px 0 0   rgba(255, 255, 255, 0.40),
+        0 0 55px rgba(200, 150, 255, 0.22),
+        0 18px 55px rgba(0, 0, 0, 0.08);
 }
 
 .glass-card {
@@ -356,7 +321,7 @@ st.markdown("""
 }
 
 .glass-table tbody tr:hover td {
-    background: rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.20);
 }
 
 .glass-table tbody tr:last-child td {
@@ -402,9 +367,7 @@ label,
 
 </style>
 
-<!-- Blobs injected as divs — multi-stop gradients, zero filter:blur -->
-<div class="blob blob-tl"></div>
-<div class="blob blob-tr"></div>
+<!-- blob-tl and blob-tr removed; remaining blobs are fixed in place -->
 <div class="blob blob-bl"></div>
 <div class="blob blob-br"></div>
 <div class="blob blob-center"></div>

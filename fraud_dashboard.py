@@ -566,12 +566,15 @@ elif page == "Risk Ranking":
 elif page == "Device/IP Risk Panel":
     st.markdown("<div class='section-header'>🖥️ Device & IP Risk Panel</div>", unsafe_allow_html=True)
 
-    # If your dataset doesn't have device_id or ip_address, simulate them
+    # Create device_id if missing
     if "device_id" not in transactions_fe.columns:
-        transactions_fe["device_id"] = (transactions_fe["customer_id"] % 50).astype(str)
+        cust_numeric = pd.to_numeric(transactions_fe["customer_id"], errors="coerce").fillna(0).astype(int)
+        transactions_fe["device_id"] = (cust_numeric % 50).astype(str)
 
+    # Create ip_address if missing
     if "ip_address" not in transactions_fe.columns:
-        transactions_fe["ip_address"] = "192.168.1." + (transactions_fe["customer_id"] % 255).astype(str)
+        cust_numeric = pd.to_numeric(transactions_fe["customer_id"], errors="coerce").fillna(0).astype(int)
+        transactions_fe["ip_address"] = "192.168.1." + (cust_numeric % 255).astype(str)
 
     # ---------------------------------------------------------
     # Highest-Risk Devices

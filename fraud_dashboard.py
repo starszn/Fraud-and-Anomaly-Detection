@@ -45,195 +45,133 @@ def glass_table(df: pd.DataFrame):
     st.markdown(html, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# CSS
+# CSS — grain-free 4K background via stacked radial-gradients
+#        (no filter:blur anywhere — vectors render crisp at any resolution)
 # ---------------------------------------------------------
 st.markdown("""
 <style>
 
-/* ── Holographic pastel base ── */
+/* ── Force GPU compositing for crisp rendering ── */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Holographic pastel base + all blobs as stacked gradients ── */
 .stApp {
-    background: linear-gradient(
-        135deg,
-        #dce8ff 0%,
-        #e8d6f8 25%,
-        #f5d6ee 50%,
-        #d6e4f8 75%,
-        #ccd8ff 100%
-    );
+    background:
+        /* Left pink sphere */
+        radial-gradient(ellipse 14% 18% at 5% 35%,
+            rgba(255, 180, 220, 0.95) 0%,
+            rgba(255, 140, 200, 0.75) 30%,
+            rgba(230, 100, 185, 0.30) 62%,
+            rgba(200,  80, 170, 0.00) 82%
+        ),
+        /* Center-left hot-pink sphere */
+        radial-gradient(ellipse 20% 24% at 20% 26%,
+            rgba(255, 210, 238, 0.95) 0%,
+            rgba(255, 155, 215, 0.80) 32%,
+            rgba(230, 105, 192, 0.35) 62%,
+            rgba(190,  70, 170, 0.00) 82%
+        ),
+        /* Large glowing white center orb */
+        radial-gradient(ellipse 52% 52% at 50% 52%,
+            rgba(255, 255, 255, 1.00)  0%,
+            rgba(255, 248, 255, 0.96) 10%,
+            rgba(252, 235, 255, 0.82) 26%,
+            rgba(238, 220, 255, 0.58) 45%,
+            rgba(218, 205, 255, 0.22) 66%,
+            rgba(200, 190, 255, 0.00) 84%
+        ),
+        /* Right periwinkle sphere */
+        radial-gradient(ellipse 18% 20% at 90% 36%,
+            rgba(215, 228, 255, 0.98) 0%,
+            rgba(175, 200, 255, 0.80) 32%,
+            rgba(140, 168, 248, 0.32) 62%,
+            rgba(110, 140, 232, 0.00) 82%
+        ),
+        /* Bottom-center blue sphere */
+        radial-gradient(ellipse 26% 28% at 56% 92%,
+            rgba(208, 222, 255, 0.98) 0%,
+            rgba(170, 194, 255, 0.78) 32%,
+            rgba(138, 165, 248, 0.30) 62%,
+            rgba(108, 138, 232, 0.00) 82%
+        ),
+        /* Top-left lavender blob */
+        radial-gradient(ellipse 52% 38% at -4% 4%,
+            rgba(208, 202, 255, 0.92) 0%,
+            rgba(182, 178, 250, 0.68) 38%,
+            rgba(155, 152, 240, 0.22) 66%,
+            rgba(130, 128, 226, 0.00) 84%
+        ),
+        /* Top-right blob */
+        radial-gradient(ellipse 44% 28% at 106% -2%,
+            rgba(198, 218, 255, 0.92) 0%,
+            rgba(166, 192, 252, 0.68) 38%,
+            rgba(140, 168, 242, 0.22) 66%,
+            rgba(114, 144, 230, 0.00) 84%
+        ),
+        /* Bottom-left blob */
+        radial-gradient(ellipse 48% 42% at -4% 106%,
+            rgba(202, 216, 255, 0.92) 0%,
+            rgba(172, 192, 252, 0.68) 38%,
+            rgba(142, 165, 242, 0.22) 66%,
+            rgba(114, 138, 230, 0.00) 84%
+        ),
+        /* Bottom-right blob */
+        radial-gradient(ellipse 44% 38% at 110% 108%,
+            rgba(212, 204, 255, 0.92) 0%,
+            rgba(182, 175, 250, 0.68) 38%,
+            rgba(152, 146, 238, 0.22) 66%,
+            rgba(124, 120, 225, 0.00) 84%
+        ),
+        /* Base canvas */
+        linear-gradient(
+            145deg,
+            #e4eaff 0%,
+            #ebd8f8 20%,
+            #f7d9ee 40%,
+            #f1e1f8 60%,
+            #dce6ff 80%,
+            #d2deff 100%
+        );
     background-attachment: fixed;
     min-height: 100vh;
     color: #2a1060;
     font-family: 'Inter', sans-serif;
     position: relative;
-    overflow: hidden;
+    /* GPU compositing — eliminates rasterisation grain */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: background;
 }
 
-/* ── Blob base styles ── */
-.blob {
-    position: fixed;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 0;
-}
-
-/* Large glowing white center orb */
-.blob-center {
-    width: 520px;
-    height: 520px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(circle at 38% 35%,
-        rgba(255, 255, 255, 1.00) 0%,
-        rgba(255, 220, 240, 0.80) 30%,
-        rgba(220, 200, 255, 0.50) 60%,
-        rgba(180, 180, 255, 0.00) 80%
-    );
-    filter: blur(18px);
-}
-
-/* Top-left lavender blob — pill shaped */
-.blob-tl {
-    width: 420px;
-    height: 300px;
-    top: -60px;
-    left: -80px;
-    border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%;
-    background: radial-gradient(circle at 40% 35%,
-        rgba(210, 200, 255, 0.95) 0%,
-        rgba(180, 170, 245, 0.75) 45%,
-        rgba(150, 140, 230, 0.00) 75%
-    );
-    filter: blur(8px);
-}
-
-/* Top-right squiggle blob */
-.blob-tr {
-    width: 380px;
-    height: 220px;
-    top: -30px;
-    right: -60px;
-    border-radius: 70% 30% 50% 50% / 40% 60% 40% 60%;
-    background: radial-gradient(circle at 35% 40%,
-        rgba(200, 215, 255, 0.95) 0%,
-        rgba(170, 190, 245, 0.70) 45%,
-        rgba(140, 165, 230, 0.00) 75%
-    );
-    filter: blur(10px);
-}
-
-/* Left pink sphere */
-.blob-left-pink {
-    width: 170px;
-    height: 170px;
-    top: 28%;
-    left: 3%;
-    background: radial-gradient(circle at 35% 30%,
-        rgba(255, 200, 230, 1.00) 0%,
-        rgba(255, 140, 200, 0.90) 40%,
-        rgba(220, 100, 180, 0.40) 70%,
-        rgba(180,  80, 160, 0.00) 90%
-    );
-    filter: blur(2px);
-    box-shadow: inset -6px -6px 14px rgba(180, 80, 160, 0.25);
-}
-
-/* Center-left hot-pink sphere */
-.blob-mid-pink {
-    width: 240px;
-    height: 240px;
-    top: 20%;
-    left: 18%;
-    background: radial-gradient(circle at 35% 28%,
-        rgba(255, 210, 235, 1.00) 0%,
-        rgba(255, 150, 210, 0.90) 38%,
-        rgba(230, 100, 190, 0.45) 65%,
-        rgba(190,  70, 170, 0.00) 85%
-    );
-    filter: blur(3px);
-    box-shadow: inset -8px -8px 18px rgba(190, 70, 170, 0.30);
-}
-
-/* Right-side periwinkle sphere */
-.blob-right-blue {
-    width: 200px;
-    height: 200px;
-    top: 25%;
-    right: 6%;
-    background: radial-gradient(circle at 35% 30%,
-        rgba(220, 230, 255, 1.00) 0%,
-        rgba(170, 195, 255, 0.90) 40%,
-        rgba(130, 160, 240, 0.40) 68%,
-        rgba(100, 130, 220, 0.00) 88%
-    );
-    filter: blur(2px);
-    box-shadow: inset -7px -7px 16px rgba(100, 130, 220, 0.28);
-}
-
-/* Bottom-left large lavender blob */
-.blob-bl {
-    width: 500px;
-    height: 350px;
-    bottom: -80px;
-    left: -100px;
-    border-radius: 50% 50% 40% 60% / 60% 40% 60% 40%;
-    background: radial-gradient(circle at 40% 35%,
-        rgba(200, 215, 255, 0.95) 0%,
-        rgba(170, 190, 248, 0.75) 45%,
-        rgba(140, 165, 235, 0.00) 75%
-    );
-    filter: blur(12px);
-}
-
-/* Bottom-center medium sphere */
-.blob-bc {
-    width: 280px;
-    height: 280px;
-    bottom: 2%;
-    left: 42%;
-    background: radial-gradient(circle at 35% 28%,
-        rgba(215, 225, 255, 1.00) 0%,
-        rgba(175, 195, 255, 0.90) 40%,
-        rgba(140, 165, 245, 0.40) 68%,
-        rgba(110, 135, 225, 0.00) 88%
-    );
-    filter: blur(3px);
-    box-shadow: inset -9px -9px 20px rgba(110, 135, 225, 0.30);
-}
-
-/* Bottom-right large blob */
-.blob-br {
-    width: 440px;
-    height: 320px;
-    bottom: -60px;
-    right: -80px;
-    border-radius: 40% 60% 50% 50% / 50% 40% 60% 50%;
-    background: radial-gradient(circle at 38% 32%,
-        rgba(210, 205, 255, 0.95) 0%,
-        rgba(180, 175, 248, 0.70) 45%,
-        rgba(150, 145, 235, 0.00) 75%
-    );
-    filter: blur(12px);
-}
-
-/* Sparkle / lens flare on the center orb */
+/* ── Sparkle/lens flare — pure gradient, no blur ── */
 .blob-sparkle {
     position: fixed;
-    width: 80px;
-    height: 80px;
-    top: calc(50% + 60px);
-    left: calc(50% - 10px);
-    background: radial-gradient(circle,
-        rgba(255, 255, 255, 1.00) 0%,
-        rgba(255, 230, 250, 0.60) 30%,
-        rgba(255, 200, 240, 0.00) 70%
-    );
-    filter: blur(2px);
+    width: 120px;
+    height: 120px;
+    top: calc(50% + 55px);
+    left: calc(50% - 15px);
+    background:
+        radial-gradient(ellipse 30% 8% at 50% 50%,
+            rgba(255, 255, 255, 1.00) 0%,
+            rgba(255, 255, 255, 0.00) 100%
+        ),
+        radial-gradient(ellipse 8% 30% at 50% 50%,
+            rgba(255, 255, 255, 1.00) 0%,
+            rgba(255, 255, 255, 0.00) 100%
+        ),
+        radial-gradient(ellipse 18% 5% at 50% 50%,
+            rgba(255, 220, 245, 0.80) 0%,
+            rgba(255, 220, 245, 0.00) 100%
+        );
     pointer-events: none;
     z-index: 0;
+    transform: translateZ(0);
 }
 
-/* Keep Streamlit content above blobs */
+/* Keep Streamlit content above background */
 .stApp > * {
     position: relative;
     z-index: 1;
@@ -242,30 +180,31 @@ st.markdown("""
 /* ── Shared liquid-glass card ── */
 .glass-card,
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed) {
-    background: rgba(255, 255, 255, 0.20);
-    backdrop-filter: blur(50px) saturate(180%) brightness(1.08);
-    -webkit-backdrop-filter: blur(50px) saturate(180%) brightness(1.08);
+    background: rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(40px) saturate(160%) brightness(1.06);
+    -webkit-backdrop-filter: blur(40px) saturate(160%) brightness(1.06);
     border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.60);
     box-shadow:
-        inset 0 1.5px 0 rgba(255, 255, 255, 0.80),
-        inset 1px 0 0   rgba(255, 255, 255, 0.40),
-        0 8px 32px rgba(140, 100, 200, 0.12),
-        0 2px 8px  rgba(0,   0,   0,   0.06);
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.85),
+        inset 1px 0 0   rgba(255, 255, 255, 0.45),
+        0 8px 32px rgba(140, 100, 200, 0.10),
+        0 2px 8px  rgba(0,   0,   0,   0.05);
     padding: 22px;
     width: 100%;
     transition: transform 0.28s ease, box-shadow 0.28s ease;
     overflow: hidden;
+    transform: translateZ(0);
 }
 
 .glass-card:hover,
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed):hover {
-    transform: translateY(-8px);
+    transform: translateY(-8px) translateZ(0);
     box-shadow:
-        inset 0 1.5px 0 rgba(255, 255, 255, 0.90),
-        inset 1px 0 0   rgba(255, 255, 255, 0.50),
-        0 0 50px rgba(200, 150, 255, 0.30),
-        0 16px 50px rgba(0, 0, 0, 0.10);
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+        inset 1px 0 0   rgba(255, 255, 255, 0.55),
+        0 0 55px rgba(200, 150, 255, 0.28),
+        0 18px 55px rgba(0, 0, 0, 0.09);
 }
 
 .glass-card {
@@ -288,7 +227,7 @@ st.markdown("""
 }
 
 .glass-table thead tr {
-    border-bottom: 1px solid rgba(150, 120, 200, 0.25);
+    border-bottom: 1px solid rgba(150, 120, 200, 0.22);
 }
 
 .glass-table th {
@@ -298,17 +237,17 @@ st.markdown("""
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(60, 30, 120, 0.60);
+    color: rgba(60, 30, 120, 0.58);
 }
 
 .glass-table td {
     padding: 11px 16px;
     color: #2a1060;
-    border-bottom: 1px solid rgba(180, 160, 220, 0.15);
+    border-bottom: 1px solid rgba(180, 160, 220, 0.13);
 }
 
 .glass-table tbody tr:hover td {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.28);
 }
 
 .glass-table tbody tr:last-child td {
@@ -321,12 +260,12 @@ st.markdown("""
     font-weight: 700;
     color: #3a1880;
     margin-bottom: 12px;
-    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.60);
+    text-shadow: 0 1px 4px rgba(255, 255, 255, 0.70);
 }
 
 .metric-title {
     font-size: 11px;
-    color: rgba(80, 40, 160, 0.70);
+    color: rgba(80, 40, 160, 0.68);
     margin-bottom: 6px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -337,12 +276,12 @@ st.markdown("""
     font-size: 30px;
     font-weight: 800;
     color: #5a12c0;
-    text-shadow: 0 2px 10px rgba(140, 80, 220, 0.20);
+    text-shadow: 0 2px 10px rgba(140, 80, 220, 0.18);
 }
 
 h1 {
     color: #3a1880 !important;
-    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.50) !important;
+    text-shadow: 0 2px 12px rgba(255, 255, 255, 0.60) !important;
 }
 
 label,
@@ -354,16 +293,6 @@ label,
 
 </style>
 
-<!-- Blob elements injected as HTML since CSS only gives us 2 pseudo-elements -->
-<div class="blob blob-center"></div>
-<div class="blob blob-tl"></div>
-<div class="blob blob-tr"></div>
-<div class="blob blob-left-pink"></div>
-<div class="blob blob-mid-pink"></div>
-<div class="blob blob-right-blue"></div>
-<div class="blob blob-bl"></div>
-<div class="blob blob-bc"></div>
-<div class="blob blob-br"></div>
 <div class="blob-sparkle"></div>
 """, unsafe_allow_html=True)
 
@@ -379,7 +308,6 @@ page = st.sidebar.radio(
     "",
     ["System Overview", "Customer Search", "Customer Details", "Risk Ranking", "Device/IP Risk Panel"]
 )
-
 
 # ---------------------------------------------------------
 # HEADER
@@ -426,20 +354,19 @@ if page == "System Overview":
     )
 
     pie_chart = (
-    alt.Chart(pie_data)
-    .mark_arc(innerRadius=70, outerRadius=120)   # ← donut shape
-    .encode(
-        theta="count():Q",
-        color=alt.Color("bucket:N", scale=alt.Scale(scheme="magma")),
-        tooltip=["bucket:N", "count():Q"]
+        alt.Chart(pie_data)
+        .mark_arc(innerRadius=70, outerRadius=120)
+        .encode(
+            theta="count():Q",
+            color=alt.Color("bucket:N", scale=alt.Scale(scheme="magma")),
+            tooltip=["bucket:N", "count():Q"]
+        )
+        .properties(
+            height=400,
+            background="transparent"
+        )
+        .configure_view(strokeWidth=0)
     )
-    .properties(
-        height=400,
-        background="transparent"
-    )
-    .configure_view(strokeWidth=0)
-)
-
 
     with st.container():
         st.markdown("<div class='section-header'>📈 Anomaly Score Distribution</div>", unsafe_allow_html=True)
@@ -577,9 +504,7 @@ elif page == "Device/IP Risk Panel":
         cust_numeric = pd.to_numeric(transactions_fe["customer_id"], errors="coerce").fillna(0).astype(int)
         transactions_fe["ip_address"] = "192.168.1." + (cust_numeric % 255).astype(str)
 
-    # ---------------------------------------------------------
     # Highest-Risk Devices
-    # ---------------------------------------------------------
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("<div class='section-header'>⚠️ Highest-Risk Devices</div>", unsafe_allow_html=True)
 
@@ -589,14 +514,11 @@ elif page == "Device/IP Risk Panel":
         .sort_values(ascending=False)
         .reset_index()
     )
-
     device_display = device_risk.head(20).copy()
     device_display["anomaly_score"] = device_display["anomaly_score"].round(4)
     glass_table(device_display)
 
-    # ---------------------------------------------------------
     # Highest-Risk IP Addresses
-    # ---------------------------------------------------------
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("<div class='section-header'>🌐 Highest-Risk IP Addresses</div>", unsafe_allow_html=True)
 
@@ -606,14 +528,11 @@ elif page == "Device/IP Risk Panel":
         .sort_values(ascending=False)
         .reset_index()
     )
-
     ip_display = ip_risk.head(20).copy()
     ip_display["anomaly_score"] = ip_display["anomaly_score"].round(4)
     glass_table(ip_display)
 
-    # ---------------------------------------------------------
     # Shared Devices (Fraud Rings)
-    # ---------------------------------------------------------
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("<div class='section-header'>🔗 Shared Devices (Possible Fraud Rings)</div>", unsafe_allow_html=True)
 
@@ -624,6 +543,5 @@ elif page == "Device/IP Risk Panel":
         .reset_index()
         .rename(columns={"customer_id": "unique_customers"})
     )
-
     sharing_display = device_sharing.head(20).copy()
     glass_table(sharing_display)

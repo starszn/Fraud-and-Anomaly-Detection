@@ -426,19 +426,20 @@ if page == "System Overview":
     )
 
     pie_chart = (
-        alt.Chart(pie_data)
-        .mark_arc(outerRadius=120)
-        .encode(
-            theta="count():Q",
-            color=alt.Color("bucket:N", scale=alt.Scale(scheme="magma")),
-            tooltip=["bucket:N", "count():Q"]
-        )
-        .properties(
-            height=400,
-            background="transparent"
-        )
-        .configure_view(strokeWidth=0)
+    alt.Chart(pie_data)
+    .mark_arc(innerRadius=70, outerRadius=120)   # ← donut shape
+    .encode(
+        theta="count():Q",
+        color=alt.Color("bucket:N", scale=alt.Scale(scheme="magma")),
+        tooltip=["bucket:N", "count():Q"]
     )
+    .properties(
+        height=400,
+        background="transparent"
+    )
+    .configure_view(strokeWidth=0)
+)
+
 
     with st.container():
         st.markdown("<div class='section-header'>📈 Anomaly Score Distribution</div>", unsafe_allow_html=True)

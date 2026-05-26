@@ -31,7 +31,7 @@ iso = joblib.load(os.path.join(BASE_DIR, "isolation_forest_model.pkl"))
 st.markdown("""
 <style>
 
-/* ── Base background — periwinkle/lavender like the reference ── */
+/* ── Base background ── */
 .stApp {
     background: linear-gradient(
         135deg,
@@ -48,7 +48,7 @@ st.markdown("""
     overflow: hidden;
 }
 
-/* ── Orb layer — sits behind everything ── */
+/* ── Orbs ── */
 .stApp::before,
 .stApp::after {
     content: '';
@@ -59,7 +59,6 @@ st.markdown("""
     pointer-events: none;
 }
 
-/* Top-center cyan/white orb */
 .stApp::before {
     width: 600px;
     height: 600px;
@@ -73,7 +72,6 @@ st.markdown("""
     );
 }
 
-/* Bottom-right coral/pink orb */
 .stApp::after {
     width: 700px;
     height: 700px;
@@ -86,7 +84,6 @@ st.markdown("""
     );
 }
 
-/* Extra orbs via a wrapper div we inject below */
 .orb-white-left {
     position: fixed;
     width: 500px;
@@ -104,7 +101,6 @@ st.markdown("""
     z-index: 0;
 }
 
-/* Ensure Streamlit content sits above orbs */
 .stApp > * {
     position: relative;
     z-index: 1;
@@ -118,12 +114,12 @@ st.markdown("""
     backdrop-filter: blur(50px) saturate(200%) brightness(1.10);
     -webkit-backdrop-filter: blur(50px) saturate(200%) brightness(1.10);
     border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     box-shadow:
-        inset 0 1.5px 0 rgba(255, 255, 255, 0.70),
-        inset 1px 0 0   rgba(255, 255, 255, 0.35),
-        0 8px 32px rgba(100, 80, 180, 0.20),
-        0 2px 8px  rgba(0,   0,   0,   0.10);
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.50),
+        inset 1px 0 0   rgba(255, 255, 255, 0.20),
+        0 8px 32px rgba(100, 80, 180, 0.15),
+        0 2px 8px  rgba(0, 0, 0, 0.08);
     padding: 22px;
     width: 100%;
     transition: transform 0.28s ease, box-shadow 0.28s ease;
@@ -144,6 +140,48 @@ st.markdown("""
 .glass-card {
     display: flex;
     flex-direction: column;
+}
+
+/* ── Fix Altair / Vega chart white background ── */
+.vega-embed,
+.vega-embed canvas,
+.vega-embed svg {
+    background: transparent !important;
+}
+
+.vega-embed .marks {
+    background: transparent !important;
+}
+
+/* Remove the white panel Vega wraps around the chart */
+.vega-embed > summary,
+.vega-embed details {
+    background: transparent !important;
+}
+
+/* ── Fix Streamlit dataframe white background ── */
+[data-testid="stDataFrame"] > div,
+[data-testid="stDataFrame"] iframe,
+.stDataFrame,
+.stDataFrame > div {
+    background: transparent !important;
+}
+
+/* Dataframe table cells */
+[data-testid="stDataFrame"] th {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #2a1060 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.30) !important;
+}
+
+[data-testid="stDataFrame"] td {
+    background: transparent !important;
+    color: #1a103a !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+[data-testid="stDataFrame"] tr:hover td {
+    background: rgba(255, 255, 255, 0.10) !important;
 }
 
 /* ── Typography ── */
@@ -171,7 +209,6 @@ st.markdown("""
     text-shadow: 0 2px 12px rgba(100, 50, 200, 0.25);
 }
 
-/* ── Streamlit widget text overrides for light bg ── */
 h1 {
     color: #1a103a !important;
     text-shadow: 0 2px 8px rgba(255,255,255,0.3);
@@ -183,7 +220,6 @@ label, .stSelectbox label, .stTextInput label, .stNumberInput label {
 
 </style>
 
-<!-- Bottom-left white orb (can't do 3+ pseudo-elements, so inject as HTML) -->
 <div class="orb-white-left"></div>
 """, unsafe_allow_html=True)
 
@@ -236,7 +272,7 @@ if page == "System Overview":
                 unsafe_allow_html=True
             )
 
-    # PIE CHART
+    # PIE CHART — transparent background set via Altair config
     pie_data = transactions_fe.copy()
     pie_data["bucket"] = pd.cut(
         pie_data["anomaly_score"],
@@ -252,7 +288,11 @@ if page == "System Overview":
             color=alt.Color("bucket:N", scale=alt.Scale(scheme="magma")),
             tooltip=["bucket:N", "count():Q"]
         )
-        .properties(height=400)
+        .properties(
+            height=400,
+            background="transparent"        # ← key: tells Vega not to fill white
+        )
+        .configure_view(strokeWidth=0)      # ← removes the border Vega draws
     )
 
     with st.container():

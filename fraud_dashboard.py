@@ -566,49 +566,60 @@ elif page == "Risk Ranking":
 elif page == "Device/IP Risk Panel":
     st.markdown("<div class='section-header'>🖥️ Device & IP Risk Panel</div>", unsafe_allow_html=True)
 
-    # --- Simulated device/IP fields ---
-    # If your dataset already has device_id or ip_address, replace these lines.
+    # If your dataset doesn't have device_id or ip_address, simulate them
     if "device_id" not in transactions_fe.columns:
-        transactions_fe["device_id"] = transactions_fe["customer_id"] % 50  # fake grouping
+        transactions_fe["device_id"] = (transactions_fe["customer_id"] % 50).astype(str)
+
     if "ip_address" not in transactions_fe.columns:
         transactions_fe["ip_address"] = "192.168.1." + (transactions_fe["customer_id"] % 255).astype(str)
 
-    # --- Device Risk ---
+    # ---------------------------------------------------------
+    # Highest-Risk Devices
+    # ---------------------------------------------------------
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>⚠️ Highest-Risk Devices</div>", unsafe_allow_html=True)
+
     device_risk = (
         transactions_fe.groupby("device_id")["anomaly_score"]
         .mean()
         .sort_values(ascending=False)
         .reset_index()
-        .head(20)
     )
 
-    with st.container():
-        st.markdown("<div class='section-header'>⚠️ Highest-Risk Devices</div>", unsafe_allow_html=True)
-        st.dataframe(device_risk, use_container_width=True)
+    device_display = device_risk.head(20).copy()
+    device_display["anomaly_score"] = device_display["anomaly_score"].round(4)
+    glass_table(device_display)
 
-    # --- IP Risk ---
+    # ---------------------------------------------------------
+    # Highest-Risk IP Addresses
+    # ---------------------------------------------------------
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>🌐 Highest-Risk IP Addresses</div>", unsafe_allow_html=True)
+
     ip_risk = (
         transactions_fe.groupby("ip_address")["anomaly_score"]
         .mean()
         .sort_values(ascending=False)
         .reset_index()
-        .head(20)
     )
 
-    with st.container():
-        st.markdown("<div class='section-header'>🌐 Highest-Risk IP Addresses</div>", unsafe_allow_html=True)
-        st.dataframe(ip_risk, use_container_width=True)
+    ip_display = ip_risk.head(20).copy()
+    ip_display["anomaly_score"] = ip_display["anomaly_score"].round(4)
+    glass_table(ip_display)
 
-    # --- Device Sharing ---
+    # ---------------------------------------------------------
+    # Shared Devices (Fraud Rings)
+    # ---------------------------------------------------------
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>🔗 Shared Devices (Possible Fraud Rings)</div>", unsafe_allow_html=True)
+
     device_sharing = (
         transactions_fe.groupby("device_id")["customer_id"]
         .nunique()
         .sort_values(ascending=False)
         .reset_index()
         .rename(columns={"customer_id": "unique_customers"})
-        .head(20)
     )
 
-    with st.container():
-        st.markdown("<div class='section-header'>🔗 Shared Devices (Possible Fraud Rings)</div>", unsafe_allow_html=True)
-        st.dataframe(device_sharing, use_container_width=True)
+    sharing_display = device_sharing.head(20).copy()
+    glass_table(sharing_display)

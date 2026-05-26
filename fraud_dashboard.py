@@ -45,133 +45,242 @@ def glass_table(df: pd.DataFrame):
     st.markdown(html, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# CSS — grain-free 4K background via stacked radial-gradients
-#        (no filter:blur anywhere — vectors render crisp at any resolution)
+# CSS
 # ---------------------------------------------------------
 st.markdown("""
 <style>
 
-/* ── Force GPU compositing for crisp rendering ── */
+/* ── Smooth font rendering ── */
 * {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Holographic pastel base + all blobs as stacked gradients ── */
+/* ── Base canvas ── */
 .stApp {
-    background:
-        /* Left pink sphere */
-        radial-gradient(ellipse 14% 18% at 5% 35%,
-            rgba(255, 180, 220, 0.95) 0%,
-            rgba(255, 140, 200, 0.75) 30%,
-            rgba(230, 100, 185, 0.30) 62%,
-            rgba(200,  80, 170, 0.00) 82%
-        ),
-        /* Center-left hot-pink sphere */
-        radial-gradient(ellipse 20% 24% at 20% 26%,
-            rgba(255, 210, 238, 0.95) 0%,
-            rgba(255, 155, 215, 0.80) 32%,
-            rgba(230, 105, 192, 0.35) 62%,
-            rgba(190,  70, 170, 0.00) 82%
-        ),
-        /* Large glowing white center orb */
-        radial-gradient(ellipse 52% 52% at 50% 52%,
-            rgba(255, 255, 255, 1.00)  0%,
-            rgba(255, 248, 255, 0.96) 10%,
-            rgba(252, 235, 255, 0.82) 26%,
-            rgba(238, 220, 255, 0.58) 45%,
-            rgba(218, 205, 255, 0.22) 66%,
-            rgba(200, 190, 255, 0.00) 84%
-        ),
-        /* Right periwinkle sphere */
-        radial-gradient(ellipse 18% 20% at 90% 36%,
-            rgba(215, 228, 255, 0.98) 0%,
-            rgba(175, 200, 255, 0.80) 32%,
-            rgba(140, 168, 248, 0.32) 62%,
-            rgba(110, 140, 232, 0.00) 82%
-        ),
-        /* Bottom-center blue sphere */
-        radial-gradient(ellipse 26% 28% at 56% 92%,
-            rgba(208, 222, 255, 0.98) 0%,
-            rgba(170, 194, 255, 0.78) 32%,
-            rgba(138, 165, 248, 0.30) 62%,
-            rgba(108, 138, 232, 0.00) 82%
-        ),
-        /* Top-left lavender blob */
-        radial-gradient(ellipse 52% 38% at -4% 4%,
-            rgba(208, 202, 255, 0.92) 0%,
-            rgba(182, 178, 250, 0.68) 38%,
-            rgba(155, 152, 240, 0.22) 66%,
-            rgba(130, 128, 226, 0.00) 84%
-        ),
-        /* Top-right blob */
-        radial-gradient(ellipse 44% 28% at 106% -2%,
-            rgba(198, 218, 255, 0.92) 0%,
-            rgba(166, 192, 252, 0.68) 38%,
-            rgba(140, 168, 242, 0.22) 66%,
-            rgba(114, 144, 230, 0.00) 84%
-        ),
-        /* Bottom-left blob */
-        radial-gradient(ellipse 48% 42% at -4% 106%,
-            rgba(202, 216, 255, 0.92) 0%,
-            rgba(172, 192, 252, 0.68) 38%,
-            rgba(142, 165, 242, 0.22) 66%,
-            rgba(114, 138, 230, 0.00) 84%
-        ),
-        /* Bottom-right blob */
-        radial-gradient(ellipse 44% 38% at 110% 108%,
-            rgba(212, 204, 255, 0.92) 0%,
-            rgba(182, 175, 250, 0.68) 38%,
-            rgba(152, 146, 238, 0.22) 66%,
-            rgba(124, 120, 225, 0.00) 84%
-        ),
-        /* Base canvas */
-        linear-gradient(
-            145deg,
-            #e4eaff 0%,
-            #ebd8f8 20%,
-            #f7d9ee 40%,
-            #f1e1f8 60%,
-            #dce6ff 80%,
-            #d2deff 100%
-        );
+    background: linear-gradient(145deg,
+        #e0e8ff 0%,
+        #ead6f8 22%,
+        #f8d6ee 44%,
+        #eeddf8 66%,
+        #d8e6ff 88%,
+        #ccd8ff 100%
+    );
     background-attachment: fixed;
     min-height: 100vh;
     color: #2a1060;
     font-family: 'Inter', sans-serif;
     position: relative;
-    /* GPU compositing — eliminates rasterisation grain */
+    overflow: hidden;
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
-    will-change: background;
 }
 
-/* ── Sparkle/lens flare — pure gradient, no blur ── */
-.blob-sparkle {
+/* ── All blobs sit behind page content ── */
+.blob {
     position: fixed;
-    width: 120px;
-    height: 120px;
-    top: calc(50% + 55px);
-    left: calc(50% - 15px);
-    background:
-        radial-gradient(ellipse 30% 8% at 50% 50%,
-            rgba(255, 255, 255, 1.00) 0%,
-            rgba(255, 255, 255, 0.00) 100%
-        ),
-        radial-gradient(ellipse 8% 30% at 50% 50%,
-            rgba(255, 255, 255, 1.00) 0%,
-            rgba(255, 255, 255, 0.00) 100%
-        ),
-        radial-gradient(ellipse 18% 5% at 50% 50%,
-            rgba(255, 220, 245, 0.80) 0%,
-            rgba(255, 220, 245, 0.00) 100%
-        );
     pointer-events: none;
     z-index: 0;
     transform: translateZ(0);
 }
 
-/* Keep Streamlit content above background */
+/* ────────────────────────────────────────
+   LARGE BLOBS (organic shapes)
+   — no filter:blur, edges fade via gradient stops
+   ──────────────────────────────────────── */
+
+/* Top-left lavender pill */
+.blob-tl {
+    width: 500px;
+    height: 360px;
+    top: -80px;
+    left: -90px;
+    border-radius: 62% 38% 72% 28% / 52% 62% 38% 48%;
+    background: radial-gradient(ellipse at 42% 38%,
+        rgba(195, 188, 255, 1.00)  0%,
+        rgba(175, 168, 252, 0.96) 18%,
+        rgba(158, 150, 245, 0.85) 35%,
+        rgba(140, 132, 235, 0.60) 55%,
+        rgba(120, 112, 222, 0.25) 75%,
+        rgba(100,  92, 210, 0.00) 90%
+    );
+}
+
+/* Top-right periwinkle pill */
+.blob-tr {
+    width: 440px;
+    height: 260px;
+    top: -40px;
+    right: -70px;
+    border-radius: 72% 28% 52% 48% / 42% 58% 42% 58%;
+    background: radial-gradient(ellipse at 38% 42%,
+        rgba(188, 212, 255, 1.00)  0%,
+        rgba(165, 194, 255, 0.96) 18%,
+        rgba(145, 175, 252, 0.84) 35%,
+        rgba(122, 155, 242, 0.58) 55%,
+        rgba(100, 132, 228, 0.22) 75%,
+        rgba( 80, 112, 215, 0.00) 90%
+    );
+}
+
+/* Bottom-left large lavender blob */
+.blob-bl {
+    width: 560px;
+    height: 400px;
+    bottom: -90px;
+    left: -110px;
+    border-radius: 52% 48% 42% 58% / 62% 38% 62% 38%;
+    background: radial-gradient(ellipse at 40% 36%,
+        rgba(190, 208, 255, 1.00)  0%,
+        rgba(168, 188, 255, 0.96) 18%,
+        rgba(148, 168, 250, 0.84) 35%,
+        rgba(125, 148, 240, 0.58) 55%,
+        rgba(102, 125, 228, 0.22) 75%,
+        rgba( 80, 102, 215, 0.00) 90%
+    );
+}
+
+/* Bottom-right purple blob */
+.blob-br {
+    width: 500px;
+    height: 380px;
+    bottom: -70px;
+    right: -90px;
+    border-radius: 42% 58% 52% 48% / 52% 42% 58% 48%;
+    background: radial-gradient(ellipse at 38% 34%,
+        rgba(205, 195, 255, 1.00)  0%,
+        rgba(182, 172, 252, 0.96) 18%,
+        rgba(162, 152, 245, 0.84) 35%,
+        rgba(140, 130, 235, 0.58) 55%,
+        rgba(118, 108, 222, 0.22) 75%,
+        rgba( 96,  88, 208, 0.00) 90%
+    );
+}
+
+/* ────────────────────────────────────────
+   3-D SPHERES
+   — highlight at top-left, shadow at bottom-right
+   — many stops = smooth shading, no blur needed
+   ──────────────────────────────────────── */
+
+/* Large white glowing center orb */
+.blob-center {
+    width: 560px;
+    height: 560px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateZ(0);
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 36% 30%,
+        rgba(255, 255, 255, 1.00)  0%,
+        rgba(255, 250, 255, 0.98)  8%,
+        rgba(252, 238, 255, 0.92) 20%,
+        rgba(244, 222, 255, 0.80) 34%,
+        rgba(232, 208, 255, 0.60) 50%,
+        rgba(218, 195, 255, 0.35) 66%,
+        rgba(200, 180, 255, 0.12) 82%,
+        rgba(180, 165, 255, 0.00) 95%
+    );
+}
+
+/* Left hot-pink sphere */
+.blob-pink-l {
+    width: 200px;
+    height: 200px;
+    top: 26%;
+    left: 4%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 33% 28%,
+        rgba(255, 225, 240, 1.00)  0%,
+        rgba(255, 190, 225, 0.97)  14%,
+        rgba(255, 155, 210, 0.90)  28%,
+        rgba(248, 120, 195, 0.78)  42%,
+        rgba(235,  88, 180, 0.58)  57%,
+        rgba(218,  62, 165, 0.32)  72%,
+        rgba(198,  42, 150, 0.10)  85%,
+        rgba(178,  28, 138, 0.00)  95%
+    );
+}
+
+/* Center-left larger pink sphere */
+.blob-pink-m {
+    width: 280px;
+    height: 280px;
+    top: 16%;
+    left: 16%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 32% 27%,
+        rgba(255, 235, 248, 1.00)  0%,
+        rgba(255, 205, 238, 0.97)  12%,
+        rgba(255, 168, 222, 0.90)  26%,
+        rgba(252, 132, 208, 0.78)  40%,
+        rgba(240,  98, 192, 0.58)  56%,
+        rgba(222,  68, 178, 0.32)  72%,
+        rgba(202,  45, 162, 0.10)  85%,
+        rgba(180,  28, 148, 0.00)  95%
+    );
+}
+
+/* Right periwinkle sphere */
+.blob-blue-r {
+    width: 240px;
+    height: 240px;
+    top: 22%;
+    right: 5%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 34% 28%,
+        rgba(235, 242, 255, 1.00)  0%,
+        rgba(208, 225, 255, 0.97)  14%,
+        rgba(178, 205, 255, 0.90)  28%,
+        rgba(148, 182, 252, 0.78)  42%,
+        rgba(118, 158, 242, 0.55)  57%,
+        rgba( 90, 135, 228, 0.28)  72%,
+        rgba( 65, 112, 215, 0.08)  85%,
+        rgba( 45,  92, 200, 0.00)  95%
+    );
+}
+
+/* Bottom-center periwinkle sphere */
+.blob-blue-b {
+    width: 310px;
+    height: 310px;
+    bottom: 3%;
+    left: 44%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 34% 28%,
+        rgba(228, 238, 255, 1.00)  0%,
+        rgba(200, 220, 255, 0.97)  14%,
+        rgba(170, 200, 255, 0.90)  28%,
+        rgba(140, 178, 252, 0.78)  42%,
+        rgba(110, 154, 240, 0.55)  57%,
+        rgba( 82, 130, 226, 0.28)  72%,
+        rgba( 58, 108, 212, 0.08)  85%,
+        rgba( 38,  88, 198, 0.00)  95%
+    );
+}
+
+/* ── Lens-flare sparkle (pure gradient, no blur) ── */
+.blob-sparkle {
+    position: fixed;
+    width: 130px;
+    height: 130px;
+    top: calc(50% + 62px);
+    left: calc(50% - 12px);
+    pointer-events: none;
+    z-index: 0;
+    transform: translateZ(0);
+    background:
+        radial-gradient(ellipse 32% 7% at 50% 50%,
+            rgba(255, 255, 255, 1.00) 0%,
+            rgba(255, 255, 255, 0.00) 100%
+        ),
+        radial-gradient(ellipse 7% 32% at 50% 50%,
+            rgba(255, 255, 255, 1.00) 0%,
+            rgba(255, 255, 255, 0.00) 100%
+        );
+}
+
+/* Keep page content above blobs */
 .stApp > * {
     position: relative;
     z-index: 1;
@@ -293,6 +402,16 @@ label,
 
 </style>
 
+<!-- Blobs injected as divs — multi-stop gradients, zero filter:blur -->
+<div class="blob blob-tl"></div>
+<div class="blob blob-tr"></div>
+<div class="blob blob-bl"></div>
+<div class="blob blob-br"></div>
+<div class="blob blob-center"></div>
+<div class="blob blob-pink-l"></div>
+<div class="blob blob-pink-m"></div>
+<div class="blob blob-blue-r"></div>
+<div class="blob blob-blue-b"></div>
 <div class="blob-sparkle"></div>
 """, unsafe_allow_html=True)
 
@@ -494,17 +613,14 @@ elif page == "Risk Ranking":
 elif page == "Device/IP Risk Panel":
     st.markdown("<div class='section-header'>🖥️ Device & IP Risk Panel</div>", unsafe_allow_html=True)
 
-    # Create device_id if missing
     if "device_id" not in transactions_fe.columns:
         cust_numeric = pd.to_numeric(transactions_fe["customer_id"], errors="coerce").fillna(0).astype(int)
         transactions_fe["device_id"] = (cust_numeric % 50).astype(str)
 
-    # Create ip_address if missing
     if "ip_address" not in transactions_fe.columns:
         cust_numeric = pd.to_numeric(transactions_fe["customer_id"], errors="coerce").fillna(0).astype(int)
         transactions_fe["ip_address"] = "192.168.1." + (cust_numeric % 255).astype(str)
 
-    # Highest-Risk Devices
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("<div class='section-header'>⚠️ Highest-Risk Devices</div>", unsafe_allow_html=True)
 
@@ -518,7 +634,6 @@ elif page == "Device/IP Risk Panel":
     device_display["anomaly_score"] = device_display["anomaly_score"].round(4)
     glass_table(device_display)
 
-    # Highest-Risk IP Addresses
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("<div class='section-header'>🌐 Highest-Risk IP Addresses</div>", unsafe_allow_html=True)
 
@@ -532,7 +647,6 @@ elif page == "Device/IP Risk Panel":
     ip_display["anomaly_score"] = ip_display["anomaly_score"].round(4)
     glass_table(ip_display)
 
-    # Shared Devices (Fraud Rings)
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("<div class='section-header'>🔗 Shared Devices (Possible Fraud Rings)</div>", unsafe_allow_html=True)
 

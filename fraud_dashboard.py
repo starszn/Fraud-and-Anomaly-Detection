@@ -26,13 +26,34 @@ transactions_fe = load_data()
 iso = joblib.load(os.path.join(BASE_DIR, "isolation_forest_model.pkl"))
 
 # ---------------------------------------------------------
+# Helper — render a DataFrame as a glass-friendly HTML table
+# ---------------------------------------------------------
+def glass_table(df: pd.DataFrame):
+    rows = ""
+    for _, row in df.iterrows():
+        cells = "".join(f"<td>{val}</td>" for val in row)
+        rows += f"<tr>{cells}</tr>"
+
+    headers = "".join(f"<th>{col}</th>" for col in df.columns)
+
+    html = f"""
+    <div class="glass-card" style="overflow-x:auto; padding:0;">
+        <table class="glass-table">
+            <thead><tr>{headers}</tr></thead>
+            <tbody>{rows}</tbody>
+        </table>
+    </div>
+    """
+    st.markdown(html, unsafe_allow_html=True)
+
+# ---------------------------------------------------------
 # CSS
 # ---------------------------------------------------------
 st.markdown("""
 <style>
 
 /* ── Base background ── */
-.stApp {
+.stApp {{
     background: linear-gradient(
         135deg,
         #6a7fd4 0%,
@@ -46,20 +67,20 @@ st.markdown("""
     font-family: 'Inter', sans-serif;
     position: relative;
     overflow: hidden;
-}
+}}
 
 /* ── Orbs ── */
 .stApp::before,
-.stApp::after {
+.stApp::after {{
     content: '';
     position: fixed;
     border-radius: 50%;
     filter: blur(90px);
     z-index: 0;
     pointer-events: none;
-}
+}}
 
-.stApp::before {
+.stApp::before {{
     width: 600px;
     height: 600px;
     top: -180px;
@@ -70,9 +91,9 @@ st.markdown("""
         rgba(140, 190, 255, 0.60) 40%,
         rgba(100, 140, 230, 0.00) 70%
     );
-}
+}}
 
-.stApp::after {
+.stApp::after {{
     width: 700px;
     height: 700px;
     bottom: -200px;
@@ -82,9 +103,9 @@ st.markdown("""
         rgba(255, 120, 160, 0.55) 40%,
         rgba(200, 100, 180, 0.00) 70%
     );
-}
+}}
 
-.orb-white-left {
+.orb-white-left {{
     position: fixed;
     width: 500px;
     height: 500px;
@@ -99,17 +120,16 @@ st.markdown("""
     filter: blur(80px);
     pointer-events: none;
     z-index: 0;
-}
+}}
 
-.stApp > * {
+.stApp > * {{
     position: relative;
     z-index: 1;
-}
+}}
 
-/* ── Shared liquid-glass mixin ── */
+/* ── Shared liquid-glass card ── */
 .glass-card,
-[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed),
-[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.stDataFrame) {
+[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed) {{
     background: rgba(255, 255, 255, 0.06);
     backdrop-filter: blur(50px) saturate(200%) brightness(1.10);
     -webkit-backdrop-filter: blur(50px) saturate(200%) brightness(1.10);
@@ -124,99 +144,93 @@ st.markdown("""
     width: 100%;
     transition: transform 0.28s ease, box-shadow 0.28s ease;
     overflow: hidden;
-}
+}}
 
 .glass-card:hover,
-[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed):hover,
-[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.stDataFrame):hover {
+[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed):hover {{
     transform: translateY(-8px);
     box-shadow:
         inset 0 1.5px 0 rgba(255, 255, 255, 0.80),
         inset 1px 0 0   rgba(255, 255, 255, 0.40),
         0 0 50px rgba(180, 120, 255, 0.35),
         0 16px 60px rgba(0, 0, 0, 0.18);
-}
+}}
 
-.glass-card {
-    display: flex;
-    flex-direction: column;
-}
-
-/* ── Fix Altair / Vega chart white background ── */
+/* ── Altair transparent background ── */
 .vega-embed,
 .vega-embed canvas,
-.vega-embed svg {
+.vega-embed svg {{
     background: transparent !important;
-}
+}}
 
-.vega-embed .marks {
-    background: transparent !important;
-}
+/* ── Glass HTML table ── */
+.glass-table {{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}}
 
-/* Remove the white panel Vega wraps around the chart */
-.vega-embed > summary,
-.vega-embed details {
-    background: transparent !important;
-}
+.glass-table thead tr {{
+    border-bottom: 1px solid rgba(255, 255, 255, 0.30);
+}}
 
-/* ── Fix Streamlit dataframe white background ── */
-[data-testid="stDataFrame"] > div,
-[data-testid="stDataFrame"] iframe,
-.stDataFrame,
-.stDataFrame > div {
-    background: transparent !important;
-}
+.glass-table th {{
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(42, 16, 96, 0.70);
+}}
 
-/* Dataframe table cells */
-[data-testid="stDataFrame"] th {
-    background: rgba(255, 255, 255, 0.15) !important;
-    color: #2a1060 !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.30) !important;
-}
+.glass-table td {{
+    padding: 11px 16px;
+    color: #1a103a;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}}
 
-[data-testid="stDataFrame"] td {
-    background: transparent !important;
-    color: #1a103a !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
-}
+.glass-table tbody tr:hover td {{
+    background: rgba(255, 255, 255, 0.12);
+}}
 
-[data-testid="stDataFrame"] tr:hover td {
-    background: rgba(255, 255, 255, 0.10) !important;
-}
+.glass-table tbody tr:last-child td {{
+    border-bottom: none;
+}}
 
 /* ── Typography ── */
-.section-header {
+.section-header {{
     font-size: 22px;
     font-weight: 700;
     color: #2a1060;
     margin-bottom: 12px;
     text-shadow: 0 1px 2px rgba(255,255,255,0.4);
-}
+}}
 
-.metric-title {
+.metric-title {{
     font-size: 11px;
     color: rgba(60, 30, 120, 0.75);
     margin-bottom: 6px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     font-weight: 600;
-}
+}}
 
-.metric-value {
+.metric-value {{
     font-size: 30px;
     font-weight: 800;
     color: #3d0f9e;
     text-shadow: 0 2px 12px rgba(100, 50, 200, 0.25);
-}
+}}
 
-h1 {
+h1 {{
     color: #1a103a !important;
     text-shadow: 0 2px 8px rgba(255,255,255,0.3);
-}
+}}
 
-label, .stSelectbox label, .stTextInput label, .stNumberInput label {
+label, .stSelectbox label, .stTextInput label, .stNumberInput label {{
     color: #2a1060 !important;
-}
+}}
 
 </style>
 
@@ -272,7 +286,7 @@ if page == "System Overview":
                 unsafe_allow_html=True
             )
 
-    # PIE CHART — transparent background set via Altair config
+    # PIE CHART — background transparent via Altair config
     pie_data = transactions_fe.copy()
     pie_data["bucket"] = pd.cut(
         pie_data["anomaly_score"],
@@ -290,9 +304,9 @@ if page == "System Overview":
         )
         .properties(
             height=400,
-            background="transparent"        # ← key: tells Vega not to fill white
+            background="transparent"
         )
-        .configure_view(strokeWidth=0)      # ← removes the border Vega draws
+        .configure_view(strokeWidth=0)
     )
 
     with st.container():
@@ -321,7 +335,7 @@ if page == "System Overview":
                 unsafe_allow_html=True
             )
 
-    # DATAFRAME
+    # DATAFRAME — rendered as glass HTML table
     st.markdown("<br>", unsafe_allow_html=True)
 
     risk_df = (
@@ -331,9 +345,10 @@ if page == "System Overview":
         .reset_index()
     )
 
-    with st.container():
-        st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
-        st.dataframe(risk_df.head(20), use_container_width=True)
+    st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
+    risk_display = risk_df.head(20).copy()
+    risk_display["anomaly_score"] = risk_display["anomaly_score"].round(4)
+    glass_table(risk_display)
 
 # ---------------------------------------------------------
 # CUSTOMER SEARCH
@@ -350,12 +365,12 @@ elif page == "Customer Search":
             customer_id = int(customer_id)
             cust_df = transactions_fe[transactions_fe["customer_id"] == customer_id]
 
-            with st.container():
-                if cust_df.empty:
-                    st.warning("Customer not found.")
-                else:
-                    st.success(f"Found {len(cust_df)} transactions.")
-                    st.dataframe(cust_df.head(20), use_container_width=True)
+            if cust_df.empty:
+                st.warning("Customer not found.")
+            else:
+                st.success(f"Found {len(cust_df)} transactions.")
+                display_df = cust_df.head(20).copy()
+                glass_table(display_df)
 
         except:
             st.error("Please enter a valid numeric ID.")
@@ -393,9 +408,9 @@ elif page == "Customer Details":
                     unsafe_allow_html=True
                 )
 
-        with st.container():
-            st.write("### Recent Transactions")
-            st.dataframe(cust_df.tail(20), use_container_width=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header'>🧾 Recent Transactions</div>", unsafe_allow_html=True)
+        glass_table(cust_df.tail(20).copy())
 
     else:
         st.info("Enter a valid customer ID.")
@@ -413,5 +428,6 @@ elif page == "Risk Ranking":
         .reset_index()
     )
 
-    with st.container():
-        st.dataframe(risk_df.head(20), use_container_width=True)
+    risk_display = risk_df.head(20).copy()
+    risk_display["anomaly_score"] = risk_display["anomaly_score"].round(4)
+    glass_table(risk_display)

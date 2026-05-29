@@ -271,6 +271,30 @@ st.markdown("""
     transform: translateZ(0);
 }
 
+            .risk-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.risk-high {
+    background: linear-gradient(135deg, #ff4e88, #d6004a);
+}
+
+.risk-medium {
+    background: linear-gradient(135deg, #ffb347, #ff7b00);
+}
+
+.risk-low {
+    background: linear-gradient(135deg, #4cd964, #1fae4b);
+}
+
 .glass-card:hover,
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed):hover {
     transform: translateY(-8px) translateZ(0);

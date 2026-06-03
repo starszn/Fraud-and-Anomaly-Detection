@@ -67,11 +67,7 @@ st.markdown("""
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* ════════════════════════════════════════════
-   BACKGROUND: on html + body so it never scrolls.
-   No transform/filter/will-change anywhere on
-   these so position:fixed children stay fixed.
-   ════════════════════════════════════════════ */
+/* ── Background on html only — never scrolls ── */
 html {
     background: linear-gradient(145deg,
         #e0e8ff 0%,
@@ -91,11 +87,8 @@ body {
 /* ── Transparent Streamlit wrappers ── */
 .stApp {
     background: transparent !important;
-    /* NO overflow:hidden — that kills scrolling */
-    /* NO transform/filter/will-change — that breaks position:fixed */
 }
 
-/* Restore Streamlit's own scroll container */
 [data-testid="stAppViewContainer"] {
     background: transparent !important;
     overflow-y: auto !important;
@@ -114,11 +107,11 @@ section.main > div,
 /* ── Risk Badges ── */
 .risk-badge {
     display: inline-block;
-    padding: 6px 12px;
-    border-radius: 14px;
-    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: white;
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
@@ -127,17 +120,13 @@ section.main > div,
 .risk-medium { background: linear-gradient(135deg, #ffb347, #ff7b00); }
 .risk-low    { background: linear-gradient(135deg, #4cd964, #1fae4b); }
 
-/* ════════════════════════════════════════════
-   BLOBS: position:fixed anchors to the viewport
-   because no ancestor has transform/filter/will-change.
-   ════════════════════════════════════════════ */
+/* ── Blobs ── */
 .blob {
     position: fixed;
     pointer-events: none;
     z-index: 0;
 }
 
-/* Bottom-left large lavender blob */
 .blob-bl {
     width: 560px;
     height: 400px;
@@ -154,7 +143,6 @@ section.main > div,
     );
 }
 
-/* Bottom-right purple blob */
 .blob-br {
     width: 500px;
     height: 380px;
@@ -171,7 +159,6 @@ section.main > div,
     );
 }
 
-/* Large white glowing center orb */
 .blob-center {
     width: 560px;
     height: 560px;
@@ -191,7 +178,6 @@ section.main > div,
     );
 }
 
-/* Left hot-pink sphere */
 .blob-pink-l {
     width: 200px;
     height: 200px;
@@ -210,7 +196,6 @@ section.main > div,
     );
 }
 
-/* Center-left larger pink sphere */
 .blob-pink-m {
     width: 280px;
     height: 280px;
@@ -229,7 +214,6 @@ section.main > div,
     );
 }
 
-/* Right periwinkle sphere */
 .blob-blue-r {
     width: 240px;
     height: 240px;
@@ -248,7 +232,6 @@ section.main > div,
     );
 }
 
-/* Bottom-center periwinkle sphere */
 .blob-blue-b {
     width: 310px;
     height: 310px;
@@ -267,7 +250,6 @@ section.main > div,
     );
 }
 
-/* Lens-flare sparkle */
 .blob-sparkle {
     position: fixed;
     width: 130px;
@@ -287,13 +269,58 @@ section.main > div,
         );
 }
 
-/* ── Page content sits above blobs ── */
 .stApp > * {
     position: relative;
     z-index: 1;
 }
 
-/* ── Shared liquid-glass card ── */
+/* ── Page title ── */
+h1 {
+    font-size: 28px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.04em !important;
+    color: #2a1060 !important;
+    text-align: center;
+    text-transform: uppercase;
+    text-shadow: none !important;
+    margin-bottom: 8px !important;
+}
+
+/* ── Thin accent line under the page title ── */
+.title-divider {
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #a78bfa, #f472b6);
+    border-radius: 2px;
+    margin: 0 auto 28px auto;
+}
+
+/* ── Section headers ── */
+.section-header {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(58, 24, 128, 0.60);
+    margin-bottom: 14px;
+    margin-top: 4px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(140, 100, 200, 0.18);
+}
+
+/* ── Sidebar title ── */
+.sidebar-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(58, 24, 128, 0.55);
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(140, 100, 200, 0.18);
+    margin-bottom: 6px;
+}
+
+/* ── Glass card ── */
 .glass-card,
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed) {
     background: rgba(255, 255, 255, 0.08);
@@ -338,7 +365,7 @@ section.main > div,
 .glass-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .glass-table thead tr {
@@ -348,11 +375,11 @@ section.main > div,
 .glass-table th {
     padding: 12px 16px;
     text-align: left;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.10em;
     text-transform: uppercase;
-    color: rgba(60, 30, 120, 0.58);
+    color: rgba(60, 30, 120, 0.50);
 }
 
 .glass-table td {
@@ -369,41 +396,33 @@ section.main > div,
     border-bottom: none;
 }
 
-/* ── Typography ── */
-.section-header {
-    font-size: 22px;
-    font-weight: 700;
-    color: #3a1880;
-    margin-bottom: 12px;
-    text-shadow: 0 1px 4px rgba(255, 255, 255, 0.70);
-}
-
+/* ── Metric tiles ── */
 .metric-title {
-    font-size: 11px;
-    color: rgba(80, 40, 160, 0.68);
-    margin-bottom: 6px;
-    letter-spacing: 0.08em;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    font-weight: 600;
+    color: rgba(80, 40, 160, 0.55);
+    margin-bottom: 8px;
 }
 
 .metric-value {
-    font-size: 30px;
+    font-size: 28px;
     font-weight: 800;
-    color: #5a12c0;
-    text-shadow: 0 2px 10px rgba(140, 80, 220, 0.18);
+    color: #4a0fa8;
+    letter-spacing: -0.01em;
 }
 
-h1 {
-    color: #3a1880 !important;
-    text-shadow: 0 2px 12px rgba(255, 255, 255, 0.60) !important;
-}
-
+/* ── Inputs ── */
 label,
 .stSelectbox label,
 .stTextInput label,
 .stNumberInput label {
     color: #3a1880 !important;
+    font-size: 11px !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    font-weight: 700 !important;
 }
 
 </style>
@@ -422,7 +441,7 @@ label,
 # SIDEBAR
 # ---------------------------------------------------------
 st.sidebar.markdown(
-    "<h2 style='color:#3a1880;'>📊 Dashboard</h2>",
+    "<div class='sidebar-title'>Navigation</div>",
     unsafe_allow_html=True
 )
 
@@ -433,7 +452,7 @@ page = st.sidebar.radio(
         "Customer Search",
         "Customer Details",
         "Risk Ranking",
-        "Device/IP Risk Panel",
+        "Device / IP Risk Panel",
         "Fraud Alerts Feed"
     ]
 )
@@ -441,17 +460,17 @@ page = st.sidebar.radio(
 # ---------------------------------------------------------
 # HEADER
 # ---------------------------------------------------------
-st.markdown(
-    "<h1 style='text-align:center;'>🔍 Fraud Detection Dashboard</h1>",
-    unsafe_allow_html=True
-)
+st.markdown("""
+    <h1>Fraud Detection Dashboard</h1>
+    <div class='title-divider'></div>
+""", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # SYSTEM OVERVIEW
 # ---------------------------------------------------------
 if page == "System Overview":
 
-    st.markdown("<div class='section-header'>📊 Fraud Metrics</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Fraud Metrics</div>", unsafe_allow_html=True)
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -495,12 +514,11 @@ if page == "System Overview":
     )
 
     with st.container():
-        st.markdown("<div class='section-header'>📈 Anomaly Score Distribution</div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header'>Anomaly Score Distribution</div>", unsafe_allow_html=True)
         st.altair_chart(pie_chart, use_container_width=True)
 
-    # Highest-Risk Customers Table
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Highest-Risk Customers</div>", unsafe_allow_html=True)
 
     risk_df = (
         transactions_fe.groupby("customer_id")["anomaly_score"]
@@ -517,10 +535,10 @@ if page == "System Overview":
 # CUSTOMER SEARCH
 # ---------------------------------------------------------
 elif page == "Customer Search":
-    st.markdown("<div class='section-header'>🔎 Customer Search</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Customer Search</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-    customer_id = st.text_input("Enter Customer ID:")
+    customer_id = st.text_input("Customer ID")
     st.markdown("</div>", unsafe_allow_html=True)
 
     if customer_id:
@@ -529,9 +547,9 @@ elif page == "Customer Search":
             cust_df = transactions_fe[transactions_fe["customer_id"] == customer_id]
 
             if cust_df.empty:
-                st.warning("Customer not found.")
+                st.warning("No records found for this customer ID.")
             else:
-                st.success(f"Found {len(cust_df)} transactions.")
+                st.success(f"{len(cust_df)} transactions found.")
                 glass_table(cust_df.head(20).copy())
 
         except:
@@ -541,10 +559,10 @@ elif page == "Customer Search":
 # CUSTOMER DETAILS
 # ---------------------------------------------------------
 elif page == "Customer Details":
-    st.markdown("<div class='section-header'>👤 Customer Details</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Customer Details</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-    customer_id = st.number_input("Enter Customer ID:", min_value=1, step=1)
+    customer_id = st.number_input("Customer ID", min_value=1, step=1)
     st.markdown("</div>", unsafe_allow_html=True)
 
     cust_df = transactions_fe[transactions_fe["customer_id"] == customer_id]
@@ -573,17 +591,17 @@ elif page == "Customer Details":
                 )
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("<div class='section-header'>🧾 Recent Transactions</div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header'>Recent Transactions</div>", unsafe_allow_html=True)
         glass_table(cust_df.tail(20).copy())
 
     else:
-        st.info("Enter a valid customer ID.")
+        st.info("Enter a valid customer ID to view details.")
 
 # ---------------------------------------------------------
 # RISK RANKING
 # ---------------------------------------------------------
 elif page == "Risk Ranking":
-    st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Highest-Risk Customers</div>", unsafe_allow_html=True)
 
     risk_df = (
         transactions_fe.groupby("customer_id")["anomaly_score"]
@@ -599,8 +617,8 @@ elif page == "Risk Ranking":
 # ---------------------------------------------------------
 # DEVICE / IP RISK PANEL
 # ---------------------------------------------------------
-elif page == "Device/IP Risk Panel":
-    st.markdown("<div class='section-header'>🖥️ Device & IP Risk Panel</div>", unsafe_allow_html=True)
+elif page == "Device / IP Risk Panel":
+    st.markdown("<div class='section-header'>Device & IP Risk Panel</div>", unsafe_allow_html=True)
 
     cust_numeric = pd.to_numeric(transactions_fe["customer_id"], errors="coerce").fillna(0).astype(int)
 
@@ -611,7 +629,7 @@ elif page == "Device/IP Risk Panel":
         transactions_fe["ip_address"] = "192.168.1." + (cust_numeric % 255).astype(str)
 
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("<div class='section-header'>⚠️ Highest-Risk Devices</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Highest-Risk Devices</div>", unsafe_allow_html=True)
 
     device_risk = (
         transactions_fe.groupby("device_id")["anomaly_score"]
@@ -625,7 +643,7 @@ elif page == "Device/IP Risk Panel":
     glass_table(device_display)
 
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("<div class='section-header'>🌐 Highest-Risk IP Addresses</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Highest-Risk IP Addresses</div>", unsafe_allow_html=True)
 
     ip_risk = (
         transactions_fe.groupby("ip_address")["anomaly_score"]
@@ -639,7 +657,7 @@ elif page == "Device/IP Risk Panel":
     glass_table(ip_display)
 
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("<div class='section-header'>🔗 Shared Devices (Possible Fraud Rings)</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Shared Devices — Possible Fraud Rings</div>", unsafe_allow_html=True)
 
     device_sharing = (
         transactions_fe.groupby("device_id")["customer_id"]
@@ -654,7 +672,7 @@ elif page == "Device/IP Risk Panel":
 # FRAUD ALERTS FEED
 # ---------------------------------------------------------
 elif page == "Fraud Alerts Feed":
-    st.markdown("<div class='section-header'>🚨 Fraud Alerts Feed</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-header'>Fraud Alerts Feed</div>", unsafe_allow_html=True)
 
     col_left, col_right = st.columns(2)
 
@@ -671,12 +689,12 @@ elif page == "Fraud Alerts Feed":
     )
 
     if alerts.empty:
-        st.info("No transactions above this anomaly score threshold.")
+        st.info("No transactions found above the selected anomaly score threshold.")
     else:
         alerts_display = alerts.copy()
         alerts_display["anomaly_score"] = alerts_display["anomaly_score"].round(4)
         alerts_display["risk_level"] = alerts_display["anomaly_score"].apply(risk_badge)
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("<div class='section-header'>Latest High-Risk Transactions</div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header'>High-Risk Transactions</div>", unsafe_allow_html=True)
         glass_table(alerts_display)

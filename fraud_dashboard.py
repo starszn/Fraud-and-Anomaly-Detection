@@ -67,37 +67,6 @@ st.markdown("""
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* ════════════════════════════════════════════════
-   KEY FIX: background lives on html + body only.
-   These are NEVER transformed, so position:fixed
-   children always anchor to the real viewport.
-   ════════════════════════════════════════════════ */
-html, body {
-    background: linear-gradient(145deg,
-        #e0e8ff 0%,
-        #ead6f8 22%,
-        #f8d6ee 44%,
-        #eeddf8 66%,
-        #d8e6ff 88%,
-        #ccd8ff 100%
-    ) !important;
-    background-attachment: fixed !important;
-    min-height: 100%;
-}
-
-/* ── Make every Streamlit wrapper transparent so
-       html/body gradient shows through ── */
-.stApp,
-[data-testid="stAppViewContainer"],
-[data-testid="stHeader"],
-section.main,
-.block-container {
-    background: transparent !important;
-    /* CRITICAL: no transform, filter, or will-change here.
-       Any of those would create a new containing block and
-       break position:fixed on the blob children. */
-}
-
 /* ── Risk Badges ── */
 .risk-badge {
     display: inline-block;
@@ -110,16 +79,45 @@ section.main,
     color: white;
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
-.risk-high   { background: linear-gradient(135deg, #ff4e88, #d6004a); }
-.risk-medium { background: linear-gradient(135deg, #ffb347, #ff7b00); }
-.risk-low    { background: linear-gradient(135deg, #4cd964, #1fae4b); }
 
-/* ── Blobs: fixed to viewport ── */
+.risk-high {
+    background: linear-gradient(135deg, #ff4e88, #d6004a);
+}
+
+.risk-medium {
+    background: linear-gradient(135deg, #ffb347, #ff7b00);
+}
+
+.risk-low {
+    background: linear-gradient(135deg, #4cd964, #1fae4b);
+}
+
+/* ── Base canvas ── */
+.stApp {
+    background: linear-gradient(145deg,
+        #e0e8ff 0%,
+        #ead6f8 22%,
+        #f8d6ee 44%,
+        #eeddf8 66%,
+        #d8e6ff 88%,
+        #ccd8ff 100%
+    );
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #2a1060;
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    overflow: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+
+/* ── All blobs ── */
 .blob {
     position: fixed;
     pointer-events: none;
     z-index: 0;
-    /* NO transform here — keeps fixed anchoring intact */
+    transform: translateZ(0);
 }
 
 /* Bottom-left large lavender blob */
@@ -162,8 +160,7 @@ section.main,
     height: 560px;
     top: 50%;
     left: 50%;
-    /* translate is on the blob itself, not an ancestor — safe */
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) translateZ(0);
     border-radius: 50%;
     background: radial-gradient(ellipse at 36% 30%,
         rgba(255, 255, 255, 1.00)  0%,
@@ -262,6 +259,7 @@ section.main,
     left: calc(50% - 12px);
     pointer-events: none;
     z-index: 0;
+    transform: translateZ(0);
     background:
         radial-gradient(ellipse 32% 7% at 50% 50%,
             rgba(255, 255, 255, 1.00) 0%,
@@ -273,13 +271,13 @@ section.main,
         );
 }
 
-/* ── Page content sits above blobs ── */
+/* Keep content above blobs */
 .stApp > * {
     position: relative;
     z-index: 1;
 }
 
-/* ── Shared liquid-glass card ── */
+/* Glass cards */
 .glass-card,
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed) {
     background: rgba(255, 255, 255, 0.08);
@@ -296,11 +294,12 @@ section.main,
     width: 100%;
     transition: transform 0.28s ease, box-shadow 0.28s ease;
     overflow: hidden;
+    transform: translateZ(0);
 }
 
 .glass-card:hover,
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed):hover {
-    transform: translateY(-8px);
+    transform: translateY(-8px) translateZ(0);
     box-shadow:
         inset 0 1.5px 0 rgba(255, 255, 255, 0.75),
         inset 1px 0 0   rgba(255, 255, 255, 0.40),
@@ -313,14 +312,14 @@ section.main,
     flex-direction: column;
 }
 
-/* ── Kill Altair white canvas ── */
+/* Altair transparency */
 .vega-embed,
 .vega-embed canvas,
 .vega-embed svg {
     background: transparent !important;
 }
 
-/* ── Glass HTML table ── */
+/* Glass HTML table */
 .glass-table {
     width: 100%;
     border-collapse: collapse;
@@ -355,7 +354,7 @@ section.main,
     border-bottom: none;
 }
 
-/* ── Typography ── */
+/* Typography */
 .section-header {
     font-size: 22px;
     font-weight: 700;
@@ -498,6 +497,7 @@ if page == "System Overview":
     risk_display = risk_df.head(20).copy()
     risk_display["anomaly_score"] = risk_display["anomaly_score"].round(4)
     risk_display["risk_level"] = risk_display["anomaly_score"].apply(risk_badge)
+
     glass_table(risk_display)
 
 # ---------------------------------------------------------
@@ -582,6 +582,7 @@ elif page == "Risk Ranking":
     risk_display = risk_df.head(20).copy()
     risk_display["anomaly_score"] = risk_display["anomaly_score"].round(4)
     risk_display["risk_level"] = risk_display["anomaly_score"].apply(risk_badge)
+
     glass_table(risk_display)
 
 # ---------------------------------------------------------
@@ -608,9 +609,11 @@ elif page == "Device/IP Risk Panel":
         .sort_values(ascending=False)
         .reset_index()
     )
+
     device_display = device_risk.head(20).copy()
     device_display["anomaly_score"] = device_display["anomaly_score"].round(4)
     device_display["risk_level"] = device_display["anomaly_score"].apply(risk_badge)
+
     glass_table(device_display)
 
     # Highest-Risk IPs
@@ -623,9 +626,11 @@ elif page == "Device/IP Risk Panel":
         .sort_values(ascending=False)
         .reset_index()
     )
+
     ip_display = ip_risk.head(20).copy()
     ip_display["anomaly_score"] = ip_display["anomaly_score"].round(4)
     ip_display["risk_level"] = ip_display["anomaly_score"].apply(risk_badge)
+
     glass_table(ip_display)
 
     # Shared Devices
@@ -639,10 +644,11 @@ elif page == "Device/IP Risk Panel":
         .reset_index()
         .rename(columns={"customer_id": "unique_customers"})
     )
+
     glass_table(device_sharing)
 
 # ---------------------------------------------------------
-# FRAUD ALERTS FEED
+# FRAUD ALERTS FEED (REALISM UPGRADE)
 # ---------------------------------------------------------
 elif page == "Fraud Alerts Feed":
     st.markdown("<div class='section-header'>🚨 Fraud Alerts Feed</div>", unsafe_allow_html=True)

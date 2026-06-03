@@ -67,6 +67,50 @@ st.markdown("""
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* ════════════════════════════════════════════
+   BACKGROUND: on html + body so it never scrolls.
+   No transform/filter/will-change anywhere on
+   these so position:fixed children stay fixed.
+   ════════════════════════════════════════════ */
+html {
+    background: linear-gradient(145deg,
+        #e0e8ff 0%,
+        #ead6f8 22%,
+        #f8d6ee 44%,
+        #eeddf8 66%,
+        #d8e6ff 88%,
+        #ccd8ff 100%
+    ) !important;
+    background-attachment: fixed !important;
+}
+
+body {
+    background: transparent !important;
+}
+
+/* ── Transparent Streamlit wrappers ── */
+.stApp {
+    background: transparent !important;
+    /* NO overflow:hidden — that kills scrolling */
+    /* NO transform/filter/will-change — that breaks position:fixed */
+}
+
+/* Restore Streamlit's own scroll container */
+[data-testid="stAppViewContainer"] {
+    background: transparent !important;
+    overflow-y: auto !important;
+    height: 100vh !important;
+}
+
+[data-testid="stHeader"] {
+    background: transparent !important;
+}
+
+section.main > div,
+.block-container {
+    background: transparent !important;
+}
+
 /* ── Risk Badges ── */
 .risk-badge {
     display: inline-block;
@@ -79,45 +123,18 @@ st.markdown("""
     color: white;
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
+.risk-high   { background: linear-gradient(135deg, #ff4e88, #d6004a); }
+.risk-medium { background: linear-gradient(135deg, #ffb347, #ff7b00); }
+.risk-low    { background: linear-gradient(135deg, #4cd964, #1fae4b); }
 
-.risk-high {
-    background: linear-gradient(135deg, #ff4e88, #d6004a);
-}
-
-.risk-medium {
-    background: linear-gradient(135deg, #ffb347, #ff7b00);
-}
-
-.risk-low {
-    background: linear-gradient(135deg, #4cd964, #1fae4b);
-}
-
-/* ── Base canvas ── */
-.stApp {
-    background: linear-gradient(145deg,
-        #e0e8ff 0%,
-        #ead6f8 22%,
-        #f8d6ee 44%,
-        #eeddf8 66%,
-        #d8e6ff 88%,
-        #ccd8ff 100%
-    );
-    background-attachment: fixed;
-    min-height: 100vh;
-    color: #2a1060;
-    font-family: 'Inter', sans-serif;
-    position: relative;
-    overflow: hidden;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-}
-
-/* ── All blobs ── */
+/* ════════════════════════════════════════════
+   BLOBS: position:fixed anchors to the viewport
+   because no ancestor has transform/filter/will-change.
+   ════════════════════════════════════════════ */
 .blob {
     position: fixed;
     pointer-events: none;
     z-index: 0;
-    transform: translateZ(0);
 }
 
 /* Bottom-left large lavender blob */
@@ -160,7 +177,7 @@ st.markdown("""
     height: 560px;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) translateZ(0);
+    transform: translate(-50%, -50%);
     border-radius: 50%;
     background: radial-gradient(ellipse at 36% 30%,
         rgba(255, 255, 255, 1.00)  0%,
@@ -259,7 +276,6 @@ st.markdown("""
     left: calc(50% - 12px);
     pointer-events: none;
     z-index: 0;
-    transform: translateZ(0);
     background:
         radial-gradient(ellipse 32% 7% at 50% 50%,
             rgba(255, 255, 255, 1.00) 0%,
@@ -271,13 +287,13 @@ st.markdown("""
         );
 }
 
-/* Keep content above blobs */
+/* ── Page content sits above blobs ── */
 .stApp > * {
     position: relative;
     z-index: 1;
 }
 
-/* Glass cards */
+/* ── Shared liquid-glass card ── */
 .glass-card,
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed) {
     background: rgba(255, 255, 255, 0.08);
@@ -294,12 +310,11 @@ st.markdown("""
     width: 100%;
     transition: transform 0.28s ease, box-shadow 0.28s ease;
     overflow: hidden;
-    transform: translateZ(0);
 }
 
 .glass-card:hover,
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed):hover {
-    transform: translateY(-8px) translateZ(0);
+    transform: translateY(-8px);
     box-shadow:
         inset 0 1.5px 0 rgba(255, 255, 255, 0.75),
         inset 1px 0 0   rgba(255, 255, 255, 0.40),
@@ -312,14 +327,14 @@ st.markdown("""
     flex-direction: column;
 }
 
-/* Altair transparency */
+/* ── Kill Altair white canvas ── */
 .vega-embed,
 .vega-embed canvas,
 .vega-embed svg {
     background: transparent !important;
 }
 
-/* Glass HTML table */
+/* ── Glass HTML table ── */
 .glass-table {
     width: 100%;
     border-collapse: collapse;
@@ -354,7 +369,7 @@ st.markdown("""
     border-bottom: none;
 }
 
-/* Typography */
+/* ── Typography ── */
 .section-header {
     font-size: 22px;
     font-weight: 700;
@@ -493,11 +508,9 @@ if page == "System Overview":
         .sort_values(ascending=False)
         .reset_index()
     )
-
     risk_display = risk_df.head(20).copy()
     risk_display["anomaly_score"] = risk_display["anomaly_score"].round(4)
     risk_display["risk_level"] = risk_display["anomaly_score"].apply(risk_badge)
-
     glass_table(risk_display)
 
 # ---------------------------------------------------------
@@ -578,11 +591,9 @@ elif page == "Risk Ranking":
         .sort_values(ascending=False)
         .reset_index()
     )
-
     risk_display = risk_df.head(20).copy()
     risk_display["anomaly_score"] = risk_display["anomaly_score"].round(4)
     risk_display["risk_level"] = risk_display["anomaly_score"].apply(risk_badge)
-
     glass_table(risk_display)
 
 # ---------------------------------------------------------
@@ -599,7 +610,6 @@ elif page == "Device/IP Risk Panel":
     if "ip_address" not in transactions_fe.columns:
         transactions_fe["ip_address"] = "192.168.1." + (cust_numeric % 255).astype(str)
 
-    # Highest-Risk Devices
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("<div class='section-header'>⚠️ Highest-Risk Devices</div>", unsafe_allow_html=True)
 
@@ -609,14 +619,11 @@ elif page == "Device/IP Risk Panel":
         .sort_values(ascending=False)
         .reset_index()
     )
-
     device_display = device_risk.head(20).copy()
     device_display["anomaly_score"] = device_display["anomaly_score"].round(4)
     device_display["risk_level"] = device_display["anomaly_score"].apply(risk_badge)
-
     glass_table(device_display)
 
-    # Highest-Risk IPs
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("<div class='section-header'>🌐 Highest-Risk IP Addresses</div>", unsafe_allow_html=True)
 
@@ -626,14 +633,11 @@ elif page == "Device/IP Risk Panel":
         .sort_values(ascending=False)
         .reset_index()
     )
-
     ip_display = ip_risk.head(20).copy()
     ip_display["anomaly_score"] = ip_display["anomaly_score"].round(4)
     ip_display["risk_level"] = ip_display["anomaly_score"].apply(risk_badge)
-
     glass_table(ip_display)
 
-    # Shared Devices
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("<div class='section-header'>🔗 Shared Devices (Possible Fraud Rings)</div>", unsafe_allow_html=True)
 
@@ -644,11 +648,10 @@ elif page == "Device/IP Risk Panel":
         .reset_index()
         .rename(columns={"customer_id": "unique_customers"})
     )
-
     glass_table(device_sharing)
 
 # ---------------------------------------------------------
-# FRAUD ALERTS FEED (REALISM UPGRADE)
+# FRAUD ALERTS FEED
 # ---------------------------------------------------------
 elif page == "Fraud Alerts Feed":
     st.markdown("<div class='section-header'>🚨 Fraud Alerts Feed</div>", unsafe_allow_html=True)

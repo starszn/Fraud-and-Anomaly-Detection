@@ -26,6 +26,17 @@ transactions_fe = load_data()
 iso = joblib.load(os.path.join(BASE_DIR, "isolation_forest_model.pkl"))
 
 # ---------------------------------------------------------
+# Helper — Risk Badge
+# ---------------------------------------------------------
+def risk_badge(score):
+    if score >= 0.7:
+        return "<span class='risk-badge risk-high'>High</span>"
+    elif score >= 0.4:
+        return "<span class='risk-badge risk-medium'>Medium</span>"
+    else:
+        return "<span class='risk-badge risk-low'>Low</span>"
+
+# ---------------------------------------------------------
 # Helper — render a DataFrame as a glass-friendly HTML table
 # ---------------------------------------------------------
 def glass_table(df: pd.DataFrame):
@@ -56,6 +67,31 @@ st.markdown("""
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* ── Risk Badges ── */
+.risk-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.risk-high {
+    background: linear-gradient(135deg, #ff4e88, #d6004a);
+}
+
+.risk-medium {
+    background: linear-gradient(135deg, #ffb347, #ff7b00);
+}
+
+.risk-low {
+    background: linear-gradient(135deg, #4cd964, #1fae4b);
+}
+
 /* ── Base canvas ── */
 .stApp {
     background: linear-gradient(145deg,
@@ -66,7 +102,6 @@ st.markdown("""
         #d8e6ff 88%,
         #ccd8ff 100%
     );
-    /* Fixed so it never scrolls with content */
     background-attachment: fixed;
     min-height: 100vh;
     color: #2a1060;
@@ -77,18 +112,13 @@ st.markdown("""
     -webkit-transform: translateZ(0);
 }
 
-/* ── All blobs: fixed so they stay put while scrolling ── */
+/* ── All blobs ── */
 .blob {
     position: fixed;
     pointer-events: none;
     z-index: 0;
     transform: translateZ(0);
 }
-
-/* ────────────────────────────────────────
-   BOTTOM CORNER BLOBS ONLY
-   (top-left and top-right removed per request)
-   ──────────────────────────────────────── */
 
 /* Bottom-left large lavender blob */
 .blob-bl {
@@ -123,10 +153,6 @@ st.markdown("""
         rgba( 96,  88, 208, 0.00) 90%
     );
 }
-
-/* ────────────────────────────────────────
-   3-D SPHERES
-   ──────────────────────────────────────── */
 
 /* Large white glowing center orb */
 .blob-center {
@@ -224,7 +250,7 @@ st.markdown("""
     );
 }
 
-/* ── Lens-flare sparkle ── */
+/* Lens-flare sparkle */
 .blob-sparkle {
     position: fixed;
     width: 130px;
@@ -245,20 +271,20 @@ st.markdown("""
         );
 }
 
-/* ── Keep page content above blobs ── */
+/* Keep content above blobs */
 .stApp > * {
     position: relative;
     z-index: 1;
 }
 
-/* ── Shared liquid-glass card — more transparent ── */
+/* Glass cards */
 .glass-card,
 [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.vega-embed) {
-    background: rgba(255, 255, 255, 0.08);       /* ↓ was 0.22 */
+    background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(40px) saturate(160%) brightness(1.06);
     -webkit-backdrop-filter: blur(40px) saturate(160%) brightness(1.06);
     border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.35); /* ↓ was 0.60 */
+    border: 1px solid rgba(255, 255, 255, 0.35);
     box-shadow:
         inset 0 1.5px 0 rgba(255, 255, 255, 0.60),
         inset 1px 0 0   rgba(255, 255, 255, 0.30),
@@ -269,30 +295,6 @@ st.markdown("""
     transition: transform 0.28s ease, box-shadow 0.28s ease;
     overflow: hidden;
     transform: translateZ(0);
-}
-
-            .risk-badge {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 14px;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
-    color: white;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-}
-
-.risk-high {
-    background: linear-gradient(135deg, #ff4e88, #d6004a);
-}
-
-.risk-medium {
-    background: linear-gradient(135deg, #ffb347, #ff7b00);
-}
-
-.risk-low {
-    background: linear-gradient(135deg, #4cd964, #1fae4b);
 }
 
 .glass-card:hover,
@@ -310,14 +312,14 @@ st.markdown("""
     flex-direction: column;
 }
 
-/* ── Kill Altair white canvas ── */
+/* Altair transparency */
 .vega-embed,
 .vega-embed canvas,
 .vega-embed svg {
     background: transparent !important;
 }
 
-/* ── Glass HTML table ── */
+/* Glass HTML table */
 .glass-table {
     width: 100%;
     border-collapse: collapse;
@@ -352,7 +354,7 @@ st.markdown("""
     border-bottom: none;
 }
 
-/* ── Typography ── */
+/* Typography */
 .section-header {
     font-size: 22px;
     font-weight: 700;
@@ -391,7 +393,6 @@ label,
 
 </style>
 
-<!-- blob-tl and blob-tr removed; remaining blobs are fixed in place -->
 <div class="blob blob-bl"></div>
 <div class="blob blob-br"></div>
 <div class="blob blob-center"></div>
@@ -412,7 +413,14 @@ st.sidebar.markdown(
 
 page = st.sidebar.radio(
     "",
-    ["System Overview", "Customer Search", "Customer Details", "Risk Ranking", "Device/IP Risk Panel"]
+    [
+        "System Overview",
+        "Customer Search",
+        "Customer Details",
+        "Risk Ranking",
+        "Device/IP Risk Panel",
+        "Fraud Alerts Feed"
+    ]
 )
 
 # ---------------------------------------------------------
@@ -451,7 +459,7 @@ if page == "System Overview":
                 unsafe_allow_html=True
             )
 
-    # PIE CHART
+    # Donut Chart
     pie_data = transactions_fe.copy()
     pie_data["bucket"] = pd.cut(
         pie_data["anomaly_score"],
@@ -467,10 +475,7 @@ if page == "System Overview":
             color=alt.Color("bucket:N", scale=alt.Scale(scheme="magma")),
             tooltip=["bucket:N", "count():Q"]
         )
-        .properties(
-            height=400,
-            background="transparent"
-        )
+        .properties(height=400, background="transparent")
         .configure_view(strokeWidth=0)
     )
 
@@ -478,29 +483,7 @@ if page == "System Overview":
         st.markdown("<div class='section-header'>📈 Anomaly Score Distribution</div>", unsafe_allow_html=True)
         st.altair_chart(pie_chart, use_container_width=True)
 
-    # SIDE METRICS
-    st.markdown("<br>", unsafe_allow_html=True)
-    colA, colB, colC = st.columns(3)
-
-    side_metrics = [
-        ("High-Risk Customers", transactions_fe.groupby("customer_id")["anomaly_score"].mean().gt(0.7).sum()),
-        ("Flagged Transactions", transactions_fe["predicted_anomaly"].sum()),
-        ("Model Version", "v1.0.0")
-    ]
-
-    for col, (title, value) in zip([colA, colB, colC], side_metrics):
-        with col:
-            st.markdown(
-                f"""
-                <div class='glass-card'>
-                    <div class='metric-title'>{title}</div>
-                    <div class='metric-value'>{value}</div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-    # TABLE
+    # Highest-Risk Customers Table
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("<div class='section-header'>🔥 Highest-Risk Customers</div>", unsafe_allow_html=True)
 
@@ -510,8 +493,11 @@ if page == "System Overview":
         .sort_values(ascending=False)
         .reset_index()
     )
+
     risk_display = risk_df.head(20).copy()
     risk_display["anomaly_score"] = risk_display["anomaly_score"].round(4)
+    risk_display["risk_level"] = risk_display["anomaly_score"].apply(risk_badge)
+
     glass_table(risk_display)
 
 # ---------------------------------------------------------
@@ -553,9 +539,11 @@ elif page == "Customer Details":
     if not cust_df.empty:
         col1, col2, col3 = st.columns(3)
 
+        avg_score = round(cust_df["anomaly_score"].mean(), 4)
+
         details = [
             ("Total Transactions", len(cust_df)),
-            ("Avg Anomaly Score", round(cust_df["anomaly_score"].mean(), 4)),
+            ("Avg Anomaly Score", f"{avg_score} {risk_badge(avg_score)}"),
             ("Detected Anomalies", cust_df["predicted_anomaly"].sum())
         ]
 
@@ -590,8 +578,11 @@ elif page == "Risk Ranking":
         .sort_values(ascending=False)
         .reset_index()
     )
+
     risk_display = risk_df.head(20).copy()
     risk_display["anomaly_score"] = risk_display["anomaly_score"].round(4)
+    risk_display["risk_level"] = risk_display["anomaly_score"].apply(risk_badge)
+
     glass_table(risk_display)
 
 # ---------------------------------------------------------
@@ -600,14 +591,15 @@ elif page == "Risk Ranking":
 elif page == "Device/IP Risk Panel":
     st.markdown("<div class='section-header'>🖥️ Device & IP Risk Panel</div>", unsafe_allow_html=True)
 
+    cust_numeric = pd.to_numeric(transactions_fe["customer_id"], errors="coerce").fillna(0).astype(int)
+
     if "device_id" not in transactions_fe.columns:
-        cust_numeric = pd.to_numeric(transactions_fe["customer_id"], errors="coerce").fillna(0).astype(int)
         transactions_fe["device_id"] = (cust_numeric % 50).astype(str)
 
     if "ip_address" not in transactions_fe.columns:
-        cust_numeric = pd.to_numeric(transactions_fe["customer_id"], errors="coerce").fillna(0).astype(int)
         transactions_fe["ip_address"] = "192.168.1." + (cust_numeric % 255).astype(str)
 
+    # Highest-Risk Devices
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("<div class='section-header'>⚠️ Highest-Risk Devices</div>", unsafe_allow_html=True)
 
@@ -617,10 +609,14 @@ elif page == "Device/IP Risk Panel":
         .sort_values(ascending=False)
         .reset_index()
     )
+
     device_display = device_risk.head(20).copy()
     device_display["anomaly_score"] = device_display["anomaly_score"].round(4)
+    device_display["risk_level"] = device_display["anomaly_score"].apply(risk_badge)
+
     glass_table(device_display)
 
+    # Highest-Risk IPs
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("<div class='section-header'>🌐 Highest-Risk IP Addresses</div>", unsafe_allow_html=True)
 
@@ -630,10 +626,14 @@ elif page == "Device/IP Risk Panel":
         .sort_values(ascending=False)
         .reset_index()
     )
+
     ip_display = ip_risk.head(20).copy()
     ip_display["anomaly_score"] = ip_display["anomaly_score"].round(4)
+    ip_display["risk_level"] = ip_display["anomaly_score"].apply(risk_badge)
+
     glass_table(ip_display)
 
+    # Shared Devices
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("<div class='section-header'>🔗 Shared Devices (Possible Fraud Rings)</div>", unsafe_allow_html=True)
 
@@ -644,5 +644,36 @@ elif page == "Device/IP Risk Panel":
         .reset_index()
         .rename(columns={"customer_id": "unique_customers"})
     )
-    sharing_display = device_sharing.head(20).copy()
-    glass_table(sharing_display)
+
+    glass_table(device_sharing)
+
+# ---------------------------------------------------------
+# FRAUD ALERTS FEED (REALISM UPGRADE)
+# ---------------------------------------------------------
+elif page == "Fraud Alerts Feed":
+    st.markdown("<div class='section-header'>🚨 Fraud Alerts Feed</div>", unsafe_allow_html=True)
+
+    col_left, col_right = st.columns(2)
+
+    with col_left:
+        top_n = st.slider("Number of alerts to show", min_value=10, max_value=100, value=25, step=5)
+    with col_right:
+        threshold = st.slider("Minimum anomaly score", min_value=0.0, max_value=1.0, value=0.7, step=0.01)
+
+    alerts = (
+        transactions_fe[transactions_fe["anomaly_score"] >= threshold]
+        .copy()
+        .sort_values("anomaly_score", ascending=False)
+        .head(top_n)
+    )
+
+    if alerts.empty:
+        st.info("No transactions above this anomaly score threshold.")
+    else:
+        alerts_display = alerts.copy()
+        alerts_display["anomaly_score"] = alerts_display["anomaly_score"].round(4)
+        alerts_display["risk_level"] = alerts_display["anomaly_score"].apply(risk_badge)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header'>Latest High-Risk Transactions</div>", unsafe_allow_html=True)
+        glass_table(alerts_display)
